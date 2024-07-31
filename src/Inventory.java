@@ -2,29 +2,29 @@ import java.util.*;
 
 public class Inventory {
 
-    private final Set<CitrusTree> inventory = new HashSet<>();
+    private final Set<FruitingPlant> inventory = new HashSet<>();
 
-    public void addItem(CitrusTree citrusTree){
-        this.inventory.add(citrusTree);
+    public void addItem(FruitingPlant fruitingPlant){
+        this.inventory.add(fruitingPlant);
     }
 
     public Set<String> getAllTypes(){
         Set<String> allTypes = new LinkedHashSet<>();
-        for(CitrusTree citrusTree: inventory){
-            allTypes.add(citrusTree.getType());
+        for(FruitingPlant fruitingPlant : inventory){
+            allTypes.add(fruitingPlant.getDreamPlant().getType());
         }
         return allTypes;
     }
 
-    public List<CitrusTree> findMatch(CitrusTree dreamCitrusTree){
-        List<CitrusTree> matching = new ArrayList<>();
-        for(CitrusTree citrusTree: inventory){
-            if(!citrusTree.getType().equals(dreamCitrusTree.getType())) continue;
-            if(!citrusTree.getPotSizeToPriceOptions().containsKey(dreamCitrusTree.getPotSize())) continue;
-            if(citrusTree.isDwarf() != dreamCitrusTree.isDwarf()) continue;
-            Float correspondingPrice = citrusTree.getPotSizeToPriceOptions().get(dreamCitrusTree.getPotSize());
-            if(correspondingPrice < dreamCitrusTree.getMinPrice() || correspondingPrice > dreamCitrusTree.getMaxPrice()) continue;
-            matching.add(citrusTree);
+    public List<FruitingPlant> findMatch(DreamPlant dreamFruitingPlant){
+        List<FruitingPlant> matching = new ArrayList<>();
+        for(FruitingPlant fruitingPlant : inventory){
+            if(!fruitingPlant.getDreamPlant().getType().equals(dreamFruitingPlant.getType())) continue;
+            if(!fruitingPlant.getDreamPlant().getPotSizeToPrice().containsKey(dreamFruitingPlant.getPotSize())) continue;
+            if(fruitingPlant.getDreamPlant().isDwarf() != dreamFruitingPlant.isDwarf()) continue;
+            Float correspondingPrice = fruitingPlant.getDreamPlant().getPotSizeToPrice().get(dreamFruitingPlant.getPotSize());
+            if(correspondingPrice < dreamFruitingPlant.getMinPrice() || correspondingPrice > dreamFruitingPlant.getMaxPrice()) continue;
+            matching.add(fruitingPlant);
         }
         return matching;
     }

@@ -15,120 +15,9 @@ public class ItemSearcher {
 
     public static void main(String[] args) {
         inventory = loadInventory(filePath);
-        CitrusTree dreamCitrusTree = getFilters();
-        processSearchResults(dreamCitrusTree);
+        DreamPlant dreamFruitingPlant = getFilters();
+        processSearchResults(dreamFruitingPlant);
         System.exit(0);
-    }
-
-    public static CitrusTree getFilters(){
-
-        String type = (String) JOptionPane.showInputDialog(null, "Please select your preferred type", appName, JOptionPane.QUESTION_MESSAGE, icon, inventory.getAllTypes().toArray(new String[0]), null);
-        if (type == null) System.exit(0);
-
-        boolean dwarf=false;
-        int chooseDwarf = JOptionPane.showConfirmDialog(null,"Would you like a dwarf tree?",appName, JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE,icon);
-        if(chooseDwarf==-1) System.exit(0);
-        else if(chooseDwarf==0) dwarf=true;
-
-        int potSize = Integer.parseInt((String) JOptionPane.showInputDialog(null,"Pot size (inch)? **min 8 inch",appName, JOptionPane.QUESTION_MESSAGE,icon,null,null));
-        if(potSize < 8) {
-            JOptionPane.showMessageDialog(null,"Invalid input. Please enter a positive number greater than 8.",appName, JOptionPane.ERROR_MESSAGE);
-            System.exit(0);
-        }
-
-        int minPrice=-1,maxPrice = -1;
-        while(minPrice<0) {
-            String userInput = (String) JOptionPane.showInputDialog(null, "Enter min price range value:", appName, JOptionPane.QUESTION_MESSAGE, icon, null, null);
-            if(userInput==null)System.exit(0);
-            try {
-                minPrice = Integer.parseInt(userInput);
-                if(minPrice<0) JOptionPane.showMessageDialog(null,"Price must be >= 0.",appName, JOptionPane.ERROR_MESSAGE);
-            }
-            catch (NumberFormatException e){
-                JOptionPane.showMessageDialog(null,"Invalid input. Please try again.", appName, JOptionPane.ERROR_MESSAGE);
-            }
-        }
-        while(maxPrice<minPrice) {
-            String userInput = (String) JOptionPane.showInputDialog(null, "Enter max price range value:", appName, JOptionPane.QUESTION_MESSAGE,icon,null, null);
-            if(userInput==null)System.exit(0);
-            try {
-                maxPrice = Integer.parseInt(userInput);
-                if(maxPrice<minPrice) JOptionPane.showMessageDialog(null,"Price must be >= "+minPrice,appName, JOptionPane.ERROR_MESSAGE);
-            }
-            catch (NumberFormatException e){
-                JOptionPane.showMessageDialog(null,"Invalid input. Please try again.", appName, JOptionPane.ERROR_MESSAGE);
-            }
-        }
-
-        CitrusTree dreamCitrusTree = new CitrusTree("", "", "", type, dwarf, potSize, new HashMap<>());
-        dreamCitrusTree.setMaxPrice(maxPrice);
-        dreamCitrusTree.setMinPrice(minPrice);
-
-        return dreamCitrusTree;
-    }
-
-    public static void processSearchResults(CitrusTree dreamCitrusTree){
-        List<CitrusTree> matching = inventory.findMatch(dreamCitrusTree);
-        if(matching.size() > 0) {
-            Map<String, CitrusTree> options = new HashMap<>();
-            StringBuilder infoToShow = new StringBuilder("Matches found!! The following citrus trees meet your criteria: \n");
-            for (CitrusTree match : matching) {
-                infoToShow.append(match.getItemInformation());
-                options.put(match.getProductName(), match);
-            }
-            String choice = (String) JOptionPane.showInputDialog(null, infoToShow + "\n\nPlease select which item you'd like to order:", appName, JOptionPane.INFORMATION_MESSAGE, icon, options.keySet().toArray(), "");
-            if(choice == null) System.exit(0);
-            CitrusTree chosenTree = options.get(choice);
-            submitOrder(getContactInfo(),chosenTree, dreamCitrusTree.getPotSize());
-            JOptionPane.showMessageDialog(null,"Thank you! Your order has been submitted. Please head to your local Greenie Geek to pay and pick up!",appName, JOptionPane.INFORMATION_MESSAGE);
-        }
-        else{
-            JOptionPane.showMessageDialog(null,"Unfortunately none of our citrus trees meet your criteria :("+
-                    "\n\tTo exit, click OK.",appName, JOptionPane.INFORMATION_MESSAGE);
-        }
-    }
-
-    public static Customer getContactInfo(){
-        String name;
-        do{
-            name = (String) JOptionPane.showInputDialog(null,"Please enter your full name (in format firstname surname): ",appName,JOptionPane.QUESTION_MESSAGE, icon, null,null);
-            if(name==null) System.exit(0);
-        } while(!isValidFullName(name));
-        String phoneNumber;
-        do{
-            phoneNumber = (String) JOptionPane.showInputDialog(null,"Please enter your phone number (10-digit number in the format 0412345678): ",appName,JOptionPane.QUESTION_MESSAGE, icon, null,null);
-            if(phoneNumber==null) System.exit(0);}
-        while(!isValidPhoneNumber(phoneNumber));
-        return new Customer(name,phoneNumber);
-    }
-
-    public static boolean isValidFullName(String fullName) {
-        String regex = "^[A-Z][a-z]+\\s[A-Z][a-zA-Z]+$";
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(fullName);
-        return matcher.matches();
-    }
-
-    public static boolean isValidPhoneNumber(String phoneNumber) {
-        Pattern pattern = Pattern.compile("^0\\d{9}$");
-        Matcher matcher = pattern.matcher(phoneNumber);
-        return matcher.matches();
-    }
-
-    public static void submitOrder(Customer customer, CitrusTree citrusTree, int potSize) {
-        String filePath = customer.name().replace(" ", "_") + "_" + citrusTree.getProductCode() + ".txt";
-        Path path = Path.of(filePath);
-        String lineToWrite = "Order details:" +
-                "\n\tName: " + customer.name() + " ("+customer.phoneNumber() +")"+
-                "\n\tItem: " + citrusTree.getProductName() + " (" + citrusTree.getProductCode() + ")" +
-                "\n\tPot size (inch): "+potSize;
-
-        try {
-            Files.writeString(path, lineToWrite);
-        } catch (IOException io) {
-            System.out.println("Order could not be placed. \nError message: " + io.getMessage());
-            System.exit(0);
-        }
     }
 
     public static Inventory loadInventory(String filePath) {
@@ -174,9 +63,120 @@ public class ItemSearcher {
                 }
             }
 
-            CitrusTree citrusTree = new CitrusTree(productName, productCode, description,type,dwarf,0,potSizeToPrice);
-            inventory.addItem(citrusTree);
+            FruitingPlant fruitingPlant = new FruitingPlant(productName, productCode, description,type,dwarf,0,potSizeToPrice);
+            inventory.addItem(fruitingPlant);
         }
         return inventory;
+    }
+
+    public static DreamPlant getFilters(){
+
+        String type = (String) JOptionPane.showInputDialog(null, "Please select your preferred type", appName, JOptionPane.QUESTION_MESSAGE, icon, inventory.getAllTypes().toArray(new String[0]), null);
+        if (type == null) System.exit(0);
+
+        boolean dwarf=false;
+        int chooseDwarf = JOptionPane.showConfirmDialog(null,"Would you like a dwarf tree?",appName, JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE,icon);
+        if(chooseDwarf==-1) System.exit(0);
+        else if(chooseDwarf==0) dwarf=true;
+
+        int potSize = Integer.parseInt((String) JOptionPane.showInputDialog(null,"Pot size (inch)? **min 8 inch",appName, JOptionPane.QUESTION_MESSAGE,icon,null,null));
+        if(potSize < 8) {
+            JOptionPane.showMessageDialog(null,"Invalid input. Please enter a positive number greater than 8.",appName, JOptionPane.ERROR_MESSAGE);
+            System.exit(0);
+        }
+
+        int minPrice=-1,maxPrice = -1;
+        while(minPrice<0) {
+            String userInput = (String) JOptionPane.showInputDialog(null, "Enter min price range value:", appName, JOptionPane.QUESTION_MESSAGE, icon, null, null);
+            if(userInput==null)System.exit(0);
+            try {
+                minPrice = Integer.parseInt(userInput);
+                if(minPrice<0) JOptionPane.showMessageDialog(null,"Price must be >= 0.",appName, JOptionPane.ERROR_MESSAGE);
+            }
+            catch (NumberFormatException e){
+                JOptionPane.showMessageDialog(null,"Invalid input. Please try again.", appName, JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        while(maxPrice<minPrice) {
+            String userInput = (String) JOptionPane.showInputDialog(null, "Enter max price range value:", appName, JOptionPane.QUESTION_MESSAGE,icon,null, null);
+            if(userInput==null)System.exit(0);
+            try {
+                maxPrice = Integer.parseInt(userInput);
+                if(maxPrice<minPrice) JOptionPane.showMessageDialog(null,"Price must be >= "+minPrice,appName, JOptionPane.ERROR_MESSAGE);
+            }
+            catch (NumberFormatException e){
+                JOptionPane.showMessageDialog(null,"Invalid input. Please try again.", appName, JOptionPane.ERROR_MESSAGE);
+            }
+        }
+
+//        FruitingPlant dreamFruitingPlant = new FruitingPlant("", "", "", type, dwarf, potSize, new HashMap<>());
+//        dreamFruitingPlant.setMaxPrice(maxPrice);
+//        dreamFruitingPlant.setMinPrice(minPrice);
+        DreamPlant dreamPlant = new DreamPlant(type, dwarf, potSize, new HashMap<>(), 0, 0);
+        return dreamPlant;
+    }
+
+    public static void processSearchResults(DreamPlant dreamFruitingPlant){
+        List<FruitingPlant> matching = inventory.findMatch(dreamFruitingPlant);
+        if(matching.size() > 0) {
+            Map<String, FruitingPlant> options = new HashMap<>();
+            StringBuilder infoToShow = new StringBuilder("Matches found!! The following citrus trees meet your criteria: \n");
+            for (FruitingPlant match : matching) {
+                infoToShow.append(match.getItemInformation());
+                options.put(match.getProductName(), match);
+            }
+            String choice = (String) JOptionPane.showInputDialog(null, infoToShow + "\n\nPlease select which item you'd like to order:", appName, JOptionPane.INFORMATION_MESSAGE, icon, options.keySet().toArray(), "");
+            if(choice == null) System.exit(0);
+            FruitingPlant chosenTree = options.get(choice);
+            submitOrder(getContactInfo(),chosenTree, dreamFruitingPlant.getPotSize());
+            JOptionPane.showMessageDialog(null,"Thank you! Your order has been submitted. Please head to your local Greenie Geek to pay and pick up!",appName, JOptionPane.INFORMATION_MESSAGE);
+        }
+        else{
+            JOptionPane.showMessageDialog(null,"Unfortunately none of our citrus trees meet your criteria :("+
+                    "\n\tTo exit, click OK.",appName, JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+
+    public static Customer getContactInfo(){
+        String name;
+        do{
+            name = (String) JOptionPane.showInputDialog(null,"Please enter your full name (in format firstname surname): ",appName,JOptionPane.QUESTION_MESSAGE, icon, null,null);
+            if(name==null) System.exit(0);
+        } while(!isValidFullName(name));
+        String phoneNumber;
+        do{
+            phoneNumber = (String) JOptionPane.showInputDialog(null,"Please enter your phone number (10-digit number in the format 0412345678): ",appName,JOptionPane.QUESTION_MESSAGE, icon, null,null);
+            if(phoneNumber==null) System.exit(0);}
+        while(!isValidPhoneNumber(phoneNumber));
+        return new Customer(name,phoneNumber);
+    }
+
+    public static void submitOrder(Customer customer, FruitingPlant fruitingPlant, int potSize) {
+        String filePath = customer.name().replace(" ", "_") + "_" + fruitingPlant.getProductCode() + ".txt";
+        Path path = Path.of(filePath);
+        String lineToWrite = "Order details:" +
+                "\n\tName: " + customer.name() + " ("+customer.phoneNumber() +")"+
+                "\n\tItem: " + fruitingPlant.getProductName() + " (" + fruitingPlant.getProductCode() + ")" +
+                "\n\tPot size (inch): "+potSize;
+
+        try {
+            Files.writeString(path, lineToWrite);
+        } catch (IOException io) {
+            System.out.println("Order could not be placed. \nError message: " + io.getMessage());
+            System.exit(0);
+        }
+    }
+
+    public static boolean isValidFullName(String fullName) {
+        String regex = "^[A-Z][a-z]+\\s[A-Z][a-zA-Z]+$";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(fullName);
+        return matcher.matches();
+    }
+
+    public static boolean isValidPhoneNumber(String phoneNumber) {
+        Pattern pattern = Pattern.compile("^0\\d{9}$");
+        Matcher matcher = pattern.matcher(phoneNumber);
+        return matcher.matches();
     }
 }
