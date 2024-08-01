@@ -14,11 +14,11 @@ public class FruitingPlant {
 //    private float minPrice;
 //    private final int potSize;
 
-    public FruitingPlant(String productCode, String productName, String description, String type, boolean dwarf, int potSize, Map<Integer,Float> potSizeToPrice) {
+    public FruitingPlant(String productCode, String productName, String description, DreamPlant dreamPlant) {
         this.productCode = productCode;
         this.productName = productName;
         this.description = description;
-        this.dreamPlant = new DreamPlant(type, dwarf, potSize, potSizeToPrice,0, 0);
+        this.dreamPlant = dreamPlant;
 //        this.type = type;
 //        this.dwarf = dwarf;
 //        this.potSize = potSize;
@@ -71,16 +71,10 @@ public class FruitingPlant {
 //        this.minPrice=minPrice;
 //    }
 
-    // This will get changed and move, dont worry for now
     public StringBuilder getItemInformation() {
-        DecimalFormat df = new DecimalFormat("0.00");
         StringBuilder output = new StringBuilder("\n*******************************************");
         output.append("\n").append(getProductName()).append(" (").append(getProductCode()).append(")\n")
-                .append(getDescription()).append("\nDwarf: ").append(isDwarf() ? "Yes" : "No")
-                .append("\nAvailable pot sizes:\n| ");
-        for (Integer potSize: potSizeToPrice.keySet()) {
-            output.append(potSize).append("inch: $").append(df.format(potSizeToPrice.get(potSize))).append(" | ");
-        }
+                .append(getDescription()).append("\nDwarf: ").append(this.getDreamPlant().getDreamPlantInformation());
         return output;
     }
 

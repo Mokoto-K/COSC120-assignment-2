@@ -62,8 +62,8 @@ public class ItemSearcher {
                     potSizeToPrice.put(potSize,price);
                 }
             }
-
-            FruitingPlant fruitingPlant = new FruitingPlant(productName, productCode, description,type,dwarf,0,potSizeToPrice);
+            DreamPlant dreamPlant = new DreamPlant(type, dwarf, 0, potSizeToPrice, 0, 0);
+            FruitingPlant fruitingPlant = new FruitingPlant(productName, productCode, description, dreamPlant);
             inventory.addItem(fruitingPlant);
         }
         return inventory;
@@ -112,7 +112,7 @@ public class ItemSearcher {
 //        FruitingPlant dreamFruitingPlant = new FruitingPlant("", "", "", type, dwarf, potSize, new HashMap<>());
 //        dreamFruitingPlant.setMaxPrice(maxPrice);
 //        dreamFruitingPlant.setMinPrice(minPrice);
-        DreamPlant dreamPlant = new DreamPlant(type, dwarf, potSize, new HashMap<>(), 0, 0);
+        DreamPlant dreamPlant = new DreamPlant(type, dwarf, potSize, new HashMap<>(), maxPrice, minPrice);
         return dreamPlant;
     }
 
