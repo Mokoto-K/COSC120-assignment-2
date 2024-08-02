@@ -7,8 +7,8 @@ public class DreamPlant {
     private final boolean dwarf;
     private final int potSize;
     private final Map<Integer,Float> potSizeToPrice;
-    private float maxPrice;
-    private float minPrice;
+    private final float maxPrice;
+    private final float minPrice;
 
     public DreamPlant(String type, boolean dwarf, int potSize, Map<Integer,Float> potSizeToPrice, float maxPrice, float minPrice){
 

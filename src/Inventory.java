@@ -14,7 +14,7 @@ public class Inventory {
 //            if(!fruitingPlant.getDreamPlant().getType().equals(dreamFruitingPlant.getType())) continue;
 //            if(!fruitingPlant.getDreamPlant().getPotSizeToPrice().containsKey(dreamFruitingPlant.getPotSize())) continue;
 //            if(fruitingPlant.getDreamPlant().isDwarf() != dreamFruitingPlant.isDwarf()) continue;
-            fruitingPlant.getDreamPlant().compareDreamPlants(dreamFruitingPlant);
+            if (!fruitingPlant.getDreamPlant().compareDreamPlants(dreamFruitingPlant)) continue;
             Float correspondingPrice = fruitingPlant.getDreamPlant().getPotSizeToPrice().get(dreamFruitingPlant.getPotSize());
             if(correspondingPrice < dreamFruitingPlant.getMinPrice() || correspondingPrice > dreamFruitingPlant.getMaxPrice()) continue;
             matching.add(fruitingPlant);
