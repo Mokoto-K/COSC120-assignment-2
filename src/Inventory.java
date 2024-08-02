@@ -8,7 +8,7 @@ public class Inventory {
         this.inventory.add(fruitingPlant);
     }
 
-    public List<FruitingPlant> findMatch(DreamPlant dreamFruitingPlant){
+    public List<FruitingPlant> findMatch(DreamFruitingPlant dreamFruitingPlant){
         List<FruitingPlant> matching = new ArrayList<>();
         for(FruitingPlant fruitingPlant : inventory){
 //            if(!fruitingPlant.getDreamPlant().getType().equals(dreamFruitingPlant.getType())) continue;

@@ -1,7 +1,7 @@
 import java.text.DecimalFormat;
 import java.util.Map;
 
-public class DreamPlant {
+public class DreamFruitingPlant {
 
     private final String type;
     private final boolean dwarf;
@@ -10,7 +10,7 @@ public class DreamPlant {
     private final float maxPrice;
     private final float minPrice;
 
-    public DreamPlant(String type, boolean dwarf, int potSize, Map<Integer,Float> potSizeToPrice, float maxPrice, float minPrice){
+    public DreamFruitingPlant(String type, boolean dwarf, int potSize, Map<Integer,Float> potSizeToPrice, float maxPrice, float minPrice){
 
         this.type = type;
         this.dwarf = dwarf;
@@ -31,7 +31,7 @@ public class DreamPlant {
     public float getMaxPrice() {return maxPrice;}
 
     public float getMinPrice() {return minPrice;}
-
+// TODO - Turn this into just a string, also do the same with other classes with descriptiuons
     public StringBuilder getDreamPlantInformation() {
         StringBuilder sb = new StringBuilder();
         DecimalFormat df = new DecimalFormat("0.00");
@@ -44,7 +44,7 @@ public class DreamPlant {
         return sb;
     }
 
-    public boolean compareDreamPlants(DreamPlant dreamFruitingPlant) {
+    public boolean compareDreamPlants(DreamFruitingPlant dreamFruitingPlant) {
         if(!this.getType().equals(dreamFruitingPlant.getType())) return false;
         if(!this.getPotSizeToPrice().containsKey(dreamFruitingPlant.getPotSize())) return false;
         if(this.isDwarf() != dreamFruitingPlant.isDwarf()) return false;

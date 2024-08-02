@@ -15,7 +15,7 @@ public class ItemSearcher {
 
     public static void main(String[] args) {
         inventory = loadInventory(filePath);
-        DreamPlant dreamFruitingPlant = getFilters();
+        DreamFruitingPlant dreamFruitingPlant = getFilters();
         processSearchResults(dreamFruitingPlant);
         System.exit(0);
     }
@@ -62,14 +62,14 @@ public class ItemSearcher {
                     potSizeToPrice.put(potSize,price);
                 }
             }
-            DreamPlant dreamPlant = new DreamPlant(type, dwarf, 0, potSizeToPrice, 0, 0);
-            FruitingPlant fruitingPlant = new FruitingPlant(productName, productCode, description, dreamPlant);
+            DreamFruitingPlant dreamFruitingPlant = new DreamFruitingPlant(type, dwarf, 0, potSizeToPrice, 0, 0);
+            FruitingPlant fruitingPlant = new FruitingPlant(productName, productCode, description, dreamFruitingPlant);
             inventory.addItem(fruitingPlant);
         }
         return inventory;
     }
 
-    public static DreamPlant getFilters(){
+    public static DreamFruitingPlant getFilters(){
 
         String type = (String) JOptionPane.showInputDialog(null, "Please select your preferred type", appName, JOptionPane.QUESTION_MESSAGE, icon, inventory.getAllTypes().toArray(new String[0]), null);
         if (type == null) System.exit(0);
@@ -112,11 +112,11 @@ public class ItemSearcher {
 //        FruitingPlant dreamFruitingPlant = new FruitingPlant("", "", "", type, dwarf, potSize, new HashMap<>());
 //        dreamFruitingPlant.setMaxPrice(maxPrice);
 //        dreamFruitingPlant.setMinPrice(minPrice);
-        DreamPlant dreamPlant = new DreamPlant(type, dwarf, potSize, new HashMap<>(), maxPrice, minPrice);
-        return dreamPlant;
+        DreamFruitingPlant dreamFruitingPlant = new DreamFruitingPlant(type, dwarf, potSize, new HashMap<>(), maxPrice, minPrice);
+        return dreamFruitingPlant;
     }
 
-    public static void processSearchResults(DreamPlant dreamFruitingPlant){
+    public static void processSearchResults(DreamFruitingPlant dreamFruitingPlant){
         List<FruitingPlant> matching = inventory.findMatch(dreamFruitingPlant);
         if(matching.size() > 0) {
             Map<String, FruitingPlant> options = new HashMap<>();

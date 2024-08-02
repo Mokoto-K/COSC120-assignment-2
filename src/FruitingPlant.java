@@ -1,12 +1,9 @@
-import java.text.DecimalFormat;
-import java.util.Map;
-
 public class FruitingPlant {
     //fields
     private final String productCode;
     private final String productName;
     private final String description;
-    private final DreamPlant dreamPlant;
+    private final DreamFruitingPlant dreamFruitingPlant;
 //    private final String type;
 //    private final boolean dwarf;
 //    private final Map<Integer,Float> potSizeToPrice;
@@ -14,11 +11,11 @@ public class FruitingPlant {
 //    private float minPrice;
 //    private final int potSize;
 
-    public FruitingPlant(String productCode, String productName, String description, DreamPlant dreamPlant) {
+    public FruitingPlant(String productCode, String productName, String description, DreamFruitingPlant dreamFruitingPlant) {
         this.productCode = productCode;
         this.productName = productName;
         this.description = description;
-        this.dreamPlant = dreamPlant;
+        this.dreamFruitingPlant = dreamFruitingPlant;
 //        this.type = type;
 //        this.dwarf = dwarf;
 //        this.potSize = potSize;
@@ -37,7 +34,7 @@ public class FruitingPlant {
         return description;
     }
 
-    public DreamPlant getDreamPlant() {return dreamPlant;}
+    public DreamFruitingPlant getDreamPlant() {return dreamFruitingPlant;}
 
     //    public String getType() {
 //        return type;
