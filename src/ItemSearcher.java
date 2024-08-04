@@ -1,3 +1,10 @@
+/**
+ * @author -
+ * Email -
+ * created for COSC120 Assignment 2
+ * Add descriptor
+ */
+
 import javax.swing.*;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -20,7 +27,7 @@ public class ItemSearcher {
         System.exit(0);
     }
 
-    public static Inventory loadInventory(String filePath) {
+    private static Inventory loadInventory(String filePath) {
         Inventory inventory = new Inventory();
         Path path = Path.of(filePath);
         List<String> fileContents = null;
@@ -30,7 +37,7 @@ public class ItemSearcher {
             System.out.println("File could not be found");
             System.exit(0);
         }
-
+        // TODO some form of simple try catch around all this data in-case of data type reading error
         for (int i = 1; i < fileContents.size(); i++) {
             String[] info = fileContents.get(i).split("\\[");
             String[] singularInfo = info[0].split(",");
@@ -69,7 +76,7 @@ public class ItemSearcher {
         return inventory;
     }
 
-    public static DreamFruitingPlant getFilters(){
+    private static DreamFruitingPlant getFilters(){
 
         String type = (String) JOptionPane.showInputDialog(null, "Please select your preferred type", appName, JOptionPane.QUESTION_MESSAGE, icon, inventory.getAllTypes().toArray(new String[0]), null);
         if (type == null) System.exit(0);
@@ -116,7 +123,7 @@ public class ItemSearcher {
         return dreamFruitingPlant;
     }
 
-    public static void processSearchResults(DreamFruitingPlant dreamFruitingPlant){
+    private static void processSearchResults(DreamFruitingPlant dreamFruitingPlant){
         List<FruitingPlant> matching = inventory.findMatch(dreamFruitingPlant);
         if(matching.size() > 0) {
             Map<String, FruitingPlant> options = new HashMap<>();
@@ -137,7 +144,7 @@ public class ItemSearcher {
         }
     }
 
-    public static Customer getContactInfo(){
+    private static Customer getContactInfo(){
         String name;
         do{
             name = (String) JOptionPane.showInputDialog(null,"Please enter your full name (in format firstname surname): ",appName,JOptionPane.QUESTION_MESSAGE, icon, null,null);
@@ -151,7 +158,7 @@ public class ItemSearcher {
         return new Customer(name,phoneNumber);
     }
 
-    public static void submitOrder(Customer customer, FruitingPlant fruitingPlant, int potSize) {
+    private static void submitOrder(Customer customer, FruitingPlant fruitingPlant, int potSize) {
         String filePath = customer.name().replace(" ", "_") + "_" + fruitingPlant.getProductCode() + ".txt";
         Path path = Path.of(filePath);
         String lineToWrite = "Order details:" +
@@ -167,16 +174,38 @@ public class ItemSearcher {
         }
     }
 
-    public static boolean isValidFullName(String fullName) {
-        String regex = "^[A-Z][a-z]+\\s[A-Z][a-zA-Z]+$";
-        Pattern pattern = Pattern.compile(regex);
+    /**
+     * Compares a given string against a predetermined sequence of charters to determine if
+     * customer input is correct. In this case the format of the users first and last name
+     * @param fullName - User input of their first and last name
+     * @return boolean True of False whether the input matched the required format
+     */
+    private static boolean isValidFullName(String fullName) {
+        // TODO this might not be good enough, re check before submission to see what happened with ass1 with this regex
+        Pattern pattern = Pattern.compile("^([A-Z][a-z '.-]*(\\s))+[A-Z][a-z '.-]*$");
+
+        // Match the users input against the required format
         Matcher matcher = pattern.matcher(fullName);
+
+        // Return the result
         return matcher.matches();
     }
 
+    /**
+     * Compares a given string against a predetermined sequence of charters to determine if
+     * customer input is correct. In this case the format of a phone number
+     * @param phoneNumber - customer phone number asked to be input
+     * @return boolean True of False whether the input matched the required format
+     */
     public static boolean isValidPhoneNumber(String phoneNumber) {
-        Pattern pattern = Pattern.compile("^0\\d{9}$");
+        // Create a pattern object containing the required format
+        // is 10 digits starting with 04
+        Pattern pattern = Pattern.compile("^04\\d{8}$");
+
+        // Match the users input against the required format
         Matcher matcher = pattern.matcher(phoneNumber);
+
+        // Return the result
         return matcher.matches();
     }
 }

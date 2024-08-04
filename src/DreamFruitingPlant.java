@@ -1,4 +1,12 @@
+/**
+ * @author -
+ * Email -
+ * created for COSC120 Assignment 2
+ * Add descriptor
+ */
+
 import java.text.DecimalFormat;
+import java.util.List;
 import java.util.Map;
 
 public class DreamFruitingPlant {
@@ -7,6 +15,8 @@ public class DreamFruitingPlant {
     private final boolean dwarf;
     private final int potSize;
     private final Map<Integer,Float> potSizeToPrice;
+    private final String trainingSystem;
+    private final List<String> pollinators;
     private final float maxPrice;
     private final float minPrice;
 
@@ -19,6 +29,10 @@ public class DreamFruitingPlant {
         this.maxPrice = maxPrice;
         this.minPrice = minPrice;
     }
+
+//    public DreamFruitingPlant() {
+//
+//    }
 
     public String getType() {return type;}
 
