@@ -15,7 +15,7 @@ stone fruit,Elberta Peach Tree, PCH700, peach, no, NA, [Redhaven, Contender], [3
 citrus,'Satsuma' Mandarin Tree,MAN035,mandarin,yes,NA,[],[69.99,89.99],[8,10],['The Satsuma Mandarin tree is easy to peel and offers deliciously sweet citrus, perfect for snacking.']
 pome,Seckel Pear Tree, PEA204, pear, no, NA, [Bartlett, Bosc], [29.99, 45.75], [12, 14], ['A small, sweet pear with a firm texture and rich flavor. Great for fresh eating and canning.']
 citrus,'Blood Orange' Tree,ORA056D,orange,yes,NA,[],[89.99,109.99,129.99],[10,12,16],['The Blood Orange tree produces strikingly colored oranges with a tangy-sweet flavor.']
-vine,'Nellie Kelly' Passionfruit,PASS017,passionfruit,NA,trellis,[],[21.90,36.99],[8,10,12],['Australian variety known for its vigorous growth and large, flavorful fruit.']
+vine,'Nellie Kelly' Passionfruit,PASS017,passionfruit,NA,trellis,[],[21.90,36.99],[8,10],['Australian variety known for its vigorous growth and large, flavorful fruit.']
 citrus,'Key Lime' Tree,LEMN092,lime,no,NA,[],[49.99,69.99],[8,10],['The Key Lime tree is known for its small, juicy limes, perfect for pies and beverages.']
 citrus,'Bearss' Lime Tree,LEMN084D,lime,yes,NA,[],[59.99,79.99,99.99],[8,10,12],['The Bearss Lime tree produces abundant fruit and is great for culinary use and beverages.']
 vine,'Thompson Seedless' Grape,GRAN032,grape,NA,cordon,[],[26.99,31.99],[8,10],['Popular green grape variety, seedless with a sweet and mild flavor.']

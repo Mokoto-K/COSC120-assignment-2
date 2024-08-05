@@ -6,7 +6,7 @@
  */
 
 public enum Filters {
-    TYPE, DWARF, TRAINING_SYSTEM, POLLINATORS, POT_SIZE;
+    CATEGORY, TYPE, DWARF, TRAINING_SYSTEM, POLLINATORS, POT_SIZE, POT_SIZE_PRICE;
 
     // TODO fix this god damn description... jeeeezuz
     /**
@@ -14,11 +14,14 @@ public enum Filters {
      */
     public String toString() {
         return switch (this) {
-            case TYPE -> "Type of fruit tree";
+            case CATEGORY -> "Type of fruit tree";
+            case TYPE -> "Type of fruit";
             case DWARF -> "Dwarf or not";
             case TRAINING_SYSTEM -> "System for training vines";
             case POLLINATORS -> "Pollinators for fruiting trees";
+            // TODO might not need potsiZe
             case POT_SIZE -> "Size of the pot";
+            case POT_SIZE_PRICE -> "Prices for pot sizes";
         };
     }
 }

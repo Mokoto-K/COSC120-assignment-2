@@ -27,6 +27,11 @@ public class ItemSearcher {
         System.exit(0);
     }
 
+    /**
+     *
+     * @param filePath
+     * @return
+     */
     private static Inventory loadInventory(String filePath) {
         Inventory inventory = new Inventory();
         Path path = Path.of(filePath);
@@ -41,18 +46,29 @@ public class ItemSearcher {
         for (int i = 1; i < fileContents.size(); i++) {
             String[] info = fileContents.get(i).split("\\[");
             String[] singularInfo = info[0].split(",");
-            String pricesRaw = info[1].replace("],","");
-            String potSizesRaw = info[2].replace("],", "");
-            String description = info[3].replace("]","");
 
-            String productCode = singularInfo[0];
+            String pollinatorsRaw = info[1].replace("],", "");
+            String pricesRaw = info[2].replace("],","");
+            String potSizesRaw = info[3].replace("],", "");
+            String description = info[4].replace("]","");
+
+            String category = singularInfo[0];
             String productName = singularInfo[1];
-            String type = singularInfo[2].trim();
+            String productCode = singularInfo[2];
+            String type = singularInfo[3].trim();
 
-            boolean dwarf = singularInfo[3].equalsIgnoreCase("yes");
+            boolean dwarf = singularInfo[4].equalsIgnoreCase("yes");
+            String trainingSystem = singularInfo[5];
+
+            // Create a list for our pollinators
+            List<String> pollinatorList = new ArrayList<>();
+            // TODO perhaps add a try catch for this iteration specifically look at price below for example
+            if (!pollinatorsRaw.isEmpty()) {
+                String[] pollinatorOptions = pollinatorsRaw.split(",");
+                pollinatorList.addAll(Arrays.asList(pollinatorOptions));
+            }
 
             Map<Integer,Float> potSizeToPrice = new LinkedHashMap<>();
-
             if(potSizesRaw.length()>0) {
                 String[] optionsPotSizes = potSizesRaw.split(",");
                 String[] optionsPrices = pricesRaw.split(",");
@@ -69,7 +85,29 @@ public class ItemSearcher {
                     potSizeToPrice.put(potSize,price);
                 }
             }
-            DreamFruitingPlant dreamFruitingPlant = new DreamFruitingPlant(type, dwarf, 0, potSizeToPrice, 0, 0);
+            // Create a map to hold all of our databases features via keys from an enum
+            Map<Filters, Object> filterMap = new LinkedHashMap<>();
+
+            // Put all of our database features into the map
+            filterMap.put(Filters.CATEGORY, category);
+            filterMap.put(Filters.TYPE, type);
+            filterMap.put(Filters.DWARF, dwarf);
+            filterMap.put(Filters.TRAINING_SYSTEM, trainingSystem);
+            filterMap.put(Filters.POLLINATORS, pollinatorList);
+            // TODO we might not need this, but putting it in for now just incase, everything to to with just the pot
+            //  sizes, not the price
+            List<String> potSizeList = new ArrayList<>();
+            if(potSizesRaw.length()>0) {
+                String[] optionsPotSizes = potSizesRaw.split(",");
+                potSizeList.addAll(Arrays.asList(optionsPotSizes));
+            }
+            filterMap.put(Filters.POT_SIZE, potSizeList);
+            filterMap.put(Filters.POT_SIZE_PRICE, potSizeToPrice);
+
+            // Create a dreamFruituingPlant object passing it our map full of goodies
+            DreamFruitingPlant dreamFruitingPlant = new DreamFruitingPlant(filterMap);
+
+//            DreamFruitingPlant dreamFruitingPlant = new DreamFruitingPlant(type, dwarf, 0, potSizeToPrice, 0, 0);
             FruitingPlant fruitingPlant = new FruitingPlant(productName, productCode, description, dreamFruitingPlant);
             inventory.addItem(fruitingPlant);
         }
