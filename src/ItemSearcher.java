@@ -114,51 +114,119 @@ public class ItemSearcher {
         return inventory;
     }
 
-    private static DreamFruitingPlant getFilters(){
+    private static DreamFruitingPlant getFilters() {
 
-        String type = (String) JOptionPane.showInputDialog(null, "Please select your preferred type", appName, JOptionPane.QUESTION_MESSAGE, icon, inventory.getAllTypes().toArray(new String[0]), null);
+        // Creating a map to hold all the users choices, using Linked to preserve order
+        Map<Filters, Object> usersDreamPlant = new LinkedHashMap<>();
+
+        // First asking the user what type of plant they are looking to buy
+        String category = (String) JOptionPane.showInputDialog(null, "Please select the type " +
+                "of plant you'd like to purchase", appName, JOptionPane.QUESTION_MESSAGE, icon, CategoryOfFruit.values(), CategoryOfFruit.CITRUS);
+        // adding their selection to the map
+        usersDreamPlant.put(Filters.CATEGORY, category);
+
+        // Getting the type of fruit the user wants and adding it to the map if their choice is not "NA"
+        String type = (String) JOptionPane.showInputDialog(null, "Please select your preferred " +
+                "type", appName, JOptionPane.QUESTION_MESSAGE, icon, inventory.getAllTypes().toArray(new String[0]), null);
         if (type == null) System.exit(0);
 
-        boolean dwarf=false;
-        int chooseDwarf = JOptionPane.showConfirmDialog(null,"Would you like a dwarf tree?",appName, JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE,icon);
-        if(chooseDwarf==-1) System.exit(0);
-        else if(chooseDwarf==0) dwarf=true;
-
-        int potSize = Integer.parseInt((String) JOptionPane.showInputDialog(null,"Pot size (inch)? **min 8 inch",appName, JOptionPane.QUESTION_MESSAGE,icon,null,null));
-        if(potSize < 8) {
-            JOptionPane.showMessageDialog(null,"Invalid input. Please enter a positive number greater than 8.",appName, JOptionPane.ERROR_MESSAGE);
-            System.exit(0);
+        if (!type.equalsIgnoreCase("na")) {
+            usersDreamPlant.put(Filters.TYPE, type);
         }
 
-        int minPrice=-1,maxPrice = -1;
-        while(minPrice<0) {
+        // TODO - Potential change to "I don't mind" and not NA
+        // Getting the customers choice of dwarf plant or not only if they didn't select vine
+        if (!category.equalsIgnoreCase(String.valueOf(CategoryOfFruit.VINE))) {
+            String dwarf = (String) JOptionPane.showInputDialog(null, "Would you like a dwarf tree?",
+                    appName, JOptionPane.QUESTION_MESSAGE, icon, inventory.getAllDwarfs().toArray(new String[0]), null);
+            if (dwarf == null) System.exit(0);
+
+            if (!type.equalsIgnoreCase("na")) {
+                usersDreamPlant.put(Filters.DWARF, dwarf);
+            }
+        }
+        // Only asking the customer what training system they would like if they chose vine as their category of plant
+        if (category.equalsIgnoreCase(String.valueOf(CategoryOfFruit.VINE))) {
+            String trainingSystem = (String) JOptionPane.showInputDialog(null, "What type of training system would you like for your vine?",
+                    appName, JOptionPane.QUESTION_MESSAGE, icon, inventory.getAllTrellis().toArray(new String[0]), null);
+            if (trainingSystem == null) System.exit(0);
+
+            if (!trainingSystem.equalsIgnoreCase("na")) {
+                usersDreamPlant.put(Filters.TRAINING_SYSTEM, trainingSystem);
+            }
+        }
+        // Create a Set to store all pollinators, we are using a set to stop duplicates from appearing
+        Set<String> tempPollinators = new HashSet<>();
+
+        // Getting the pollinators for category choices, STONE or POME, otherwise skipping this step
+        if (category.equalsIgnoreCase(String.valueOf(CategoryOfFruit.POME)) || category.equalsIgnoreCase(String.valueOf(CategoryOfFruit.STONE_FRUIT))) {
+
+            // Create a loop to continue asking the customer to choose a pollinator until they skip or reply no to add another
+            int decision = 0;
+            while (decision == 0) {
+
+                String pollinator = (String) JOptionPane.showInputDialog(null, "What type of training system would you like for your vine?",
+                        appName, JOptionPane.QUESTION_MESSAGE, icon, inventory.getAllPollinators().toArray(new String[0]), null);
+
+                if (pollinator == null) System.exit(0);
+
+                // if the customer selects a pollinator, add it to the list, otherwise break out of the loop
+                if (!pollinator.equalsIgnoreCase("na")) {
+                    tempPollinators.add(pollinator);
+                } else {
+                    break;
+                }
+
+                // Ask the customer if they would like to add another pollinator, then run through it all again
+                decision = JOptionPane.showConfirmDialog(null, "Would you like to add another pollinator",
+                        appName, JOptionPane.YES_NO_OPTION);
+            }
+        }
+
+        // If they chose to add at least one pollinator, add it to the map
+        if (!tempPollinators.isEmpty()) {
+            usersDreamPlant.put(Filters.POLLINATORS, tempPollinators);
+        }
+
+        int potSize = 7;
+        while (potSize < 8) {
+            String userInput = (String) JOptionPane.showInputDialog(null, "What size pot would you like? Options are even numbers from 8 - 16inch", appName, JOptionPane.QUESTION_MESSAGE, icon, null, null);
+            if (userInput == null) System.exit(0);
+            try {
+                potSize = Integer.parseInt((String) JOptionPane.showInputDialog(null, "Pot size (inch)? **min 8 inch", appName, JOptionPane.QUESTION_MESSAGE, icon, null, null));
+                if (potSize < 7)
+                    JOptionPane.showMessageDialog(null, "Pot size must be at least 8", appName, JOptionPane.ERROR_MESSAGE);
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(null, "Invalid input. Please try again.", appName, JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        usersDreamPlant.put(Filters.POT_SIZE, potSize);
+
+        int minPrice = -1, maxPrice = -1;
+        while (minPrice < 0) {
             String userInput = (String) JOptionPane.showInputDialog(null, "Enter min price range value:", appName, JOptionPane.QUESTION_MESSAGE, icon, null, null);
-            if(userInput==null)System.exit(0);
+            if (userInput == null) System.exit(0);
             try {
                 minPrice = Integer.parseInt(userInput);
-                if(minPrice<0) JOptionPane.showMessageDialog(null,"Price must be >= 0.",appName, JOptionPane.ERROR_MESSAGE);
-            }
-            catch (NumberFormatException e){
-                JOptionPane.showMessageDialog(null,"Invalid input. Please try again.", appName, JOptionPane.ERROR_MESSAGE);
+                if (minPrice < 0)
+                    JOptionPane.showMessageDialog(null, "Price must be >= 0.", appName, JOptionPane.ERROR_MESSAGE);
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(null, "Invalid input. Please try again.", appName, JOptionPane.ERROR_MESSAGE);
             }
         }
-        while(maxPrice<minPrice) {
-            String userInput = (String) JOptionPane.showInputDialog(null, "Enter max price range value:", appName, JOptionPane.QUESTION_MESSAGE,icon,null, null);
-            if(userInput==null)System.exit(0);
+        while (maxPrice < minPrice) {
+            String userInput = (String) JOptionPane.showInputDialog(null, "Enter max price range value:", appName, JOptionPane.QUESTION_MESSAGE, icon, null, null);
+            if (userInput == null) System.exit(0);
             try {
                 maxPrice = Integer.parseInt(userInput);
-                if(maxPrice<minPrice) JOptionPane.showMessageDialog(null,"Price must be >= "+minPrice,appName, JOptionPane.ERROR_MESSAGE);
-            }
-            catch (NumberFormatException e){
-                JOptionPane.showMessageDialog(null,"Invalid input. Please try again.", appName, JOptionPane.ERROR_MESSAGE);
+                if (maxPrice < minPrice)
+                    JOptionPane.showMessageDialog(null, "Price must be >= " + minPrice, appName, JOptionPane.ERROR_MESSAGE);
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(null, "Invalid input. Please try again.", appName, JOptionPane.ERROR_MESSAGE);
             }
         }
 
-//        FruitingPlant dreamFruitingPlant = new FruitingPlant("", "", "", type, dwarf, potSize, new HashMap<>());
-//        dreamFruitingPlant.setMaxPrice(maxPrice);
-//        dreamFruitingPlant.setMinPrice(minPrice);
-        DreamFruitingPlant dreamFruitingPlant = new DreamFruitingPlant(type, dwarf, potSize, new HashMap<>(), maxPrice, minPrice);
-        return dreamFruitingPlant;
+        return new DreamFruitingPlant(usersDreamPlant, maxPrice, minPrice);
     }
 
     private static void processSearchResults(DreamFruitingPlant dreamFruitingPlant){

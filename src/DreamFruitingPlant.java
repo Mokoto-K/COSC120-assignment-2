@@ -6,9 +6,7 @@
  */
 
 import java.text.DecimalFormat;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 public class DreamFruitingPlant {
 
@@ -74,10 +72,22 @@ public class DreamFruitingPlant {
 //        return sb;
     }
 
+    // TODO - You have to try your hardest to implement exactly what this is doing, but in a more naturally you way
+    // I didnt write thie, so im uneasy with it.
     public boolean compareDreamPlants(DreamFruitingPlant dreamFruitingPlant) {
-        if(!this.getType().equals(dreamFruitingPlant.getType())) return false;
-        if(!this.getPotSizeToPrice().containsKey(dreamFruitingPlant.getPotSize())) return false;
-        if(this.isDwarf() != dreamFruitingPlant.isDwarf()) return false;
+        for (Filters key : dreamFruitingPlant.getAllFilters().keySet()) {
+            if (this.getAllFilters().containsKey(key)) {
+                if (getFilter(key) instanceof Collection<?> && dreamFruitingPlant.getFilter(key) instanceof Collection<?>) {
+                    Set<Object> intersect = new HashSet<>((Collection<?>) dreamFruitingPlant.getFilter(key));
+                    intersect.retainAll((Collection<?>) dreamFruitingPlant.getFilter(key));
+                    if (intersect.isEmpty()) return false;
+                }
+                else if (dreamFruitingPlant.getFilter(key) instanceof Collection<?> && !(getFilter(key) instanceof Collection<?>)) {
+                    if (!((Collection<?>) dreamFruitingPlant.getFilter(key)).contains(getFilter(key))) return false;
+                }
+                else if (!getFilter(key).equals(dreamFruitingPlant.getFilter(key))) return false;
+            }
+        }
         return true;
     }
 

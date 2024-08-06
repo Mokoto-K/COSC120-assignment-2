@@ -18,9 +18,6 @@ public class Inventory {
     public List<FruitingPlant> findMatch(DreamFruitingPlant dreamFruitingPlant){
         List<FruitingPlant> matching = new ArrayList<>();
         for(FruitingPlant fruitingPlant : inventory){
-//            if(!fruitingPlant.getDreamPlant().getType().equals(dreamFruitingPlant.getType())) continue;
-//            if(!fruitingPlant.getDreamPlant().getPotSizeToPrice().containsKey(dreamFruitingPlant.getPotSize())) continue;
-//            if(fruitingPlant.getDreamPlant().isDwarf() != dreamFruitingPlant.isDwarf()) continue;
             if (!fruitingPlant.getDreamPlant().compareDreamPlants(dreamFruitingPlant)) continue;
             Float correspondingPrice = fruitingPlant.getDreamPlant().getPotSizeToPrice().get(dreamFruitingPlant.getPotSize());
             if(correspondingPrice < dreamFruitingPlant.getMinPrice() || correspondingPrice > dreamFruitingPlant.getMaxPrice()) continue;
@@ -29,6 +26,7 @@ public class Inventory {
         return matching;
     }
 
+    // TODO - Add NA to the set
     public Set<String> getAllTypes(){
         Set<String> allTypes = new LinkedHashSet<>();
         for(FruitingPlant fruitingPlant : inventory){
@@ -36,4 +34,21 @@ public class Inventory {
         }
         return allTypes;
     }
+
+    public Set<String> getAllDwarfs(){
+        Set<String> allDwarfs = new LinkedHashSet<>();
+        return allDwarfs;
+    }
+
+    public Set<String> getAllTrellis(){
+        Set<String> allDwarfs = new LinkedHashSet<>();
+        return allDwarfs;
+    }
+
+    public Set<String> getAllPollinators(){
+        Set<String> allDwarfs = new LinkedHashSet<>();
+        return allDwarfs;
+    }
+    // TODO - Build a "getAllDwarfs" set creator
+    // TODO - Build a "getAllTrellis" set creator
 }
