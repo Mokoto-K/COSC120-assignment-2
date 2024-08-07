@@ -56,7 +56,7 @@ public class DreamFruitingPlant {
     public float getMinPrice() {return minPrice;}
 
 // TODO - The structure of the string will need to change once I can run the program
-    public StringBuilder getDreamPlantInformation() {
+    public StringBuilder getDreamPlantInformation(Map<Filters, Object> filters) {
         StringBuilder sb = new StringBuilder();
         for (Filters key : filters.keySet()) {
             sb.append("\n").append(key).append(" : ").append(getFilter(key));
@@ -75,17 +75,50 @@ public class DreamFruitingPlant {
     // TODO - You have to try your hardest to implement exactly what this is doing, but in a more naturally you way
     // I didnt write thie, so im uneasy with it.
     public boolean compareDreamPlants(DreamFruitingPlant dreamFruitingPlant) {
+        System.out.println(dreamFruitingPlant.getAllFilters());
+        System.out.println(this.getAllFilters());
+
+
+
         for (Filters key : dreamFruitingPlant.getAllFilters().keySet()) {
+
+//            if (this.getFilter(key).equals(dreamFruitingPlant.getFilter(key).toString()))
+//                return true;
+
+
+            System.out.println(key);
             if (this.getAllFilters().containsKey(key)) {
-                if (getFilter(key) instanceof Collection<?> && dreamFruitingPlant.getFilter(key) instanceof Collection<?>) {
+                System.out.println("1");
+
+                if (this.getFilter(key) instanceof Collection<?> && dreamFruitingPlant.getFilter(key) instanceof Collection<?>) {
                     Set<Object> intersect = new HashSet<>((Collection<?>) dreamFruitingPlant.getFilter(key));
                     intersect.retainAll((Collection<?>) dreamFruitingPlant.getFilter(key));
+                    System.out.println("2");
                     if (intersect.isEmpty()) return false;
                 }
-                else if (dreamFruitingPlant.getFilter(key) instanceof Collection<?> && !(getFilter(key) instanceof Collection<?>)) {
-                    if (!((Collection<?>) dreamFruitingPlant.getFilter(key)).contains(getFilter(key))) return false;
+
+                // I added this elif, might need to be deleted
+                else if (this.getFilter(key) instanceof Collection<?> && !(dreamFruitingPlant.getFilter(key) instanceof Collection<?>)) {
+                    return true;
+
                 }
-                else if (!getFilter(key).equals(dreamFruitingPlant.getFilter(key))) return false;
+
+
+                else if (dreamFruitingPlant.getFilter(key) instanceof Collection<?> && !(this.getFilter(key) instanceof Collection<?>)) {
+                    System.out.println("3");
+                    if (!((Collection<?>) dreamFruitingPlant.getFilter(key)).contains(this.getFilter(key))) {
+
+                        System.out.println("4");
+                        return false;
+                    }
+
+                }
+                else if (!this.getFilter(key).equals(dreamFruitingPlant.getFilter(key).toString())) {
+                    System.out.println(this.getFilter(key).toString());
+                    System.out.println(dreamFruitingPlant.getFilter(key).toString());
+                    System.out.println("5");
+                    return false;
+                }
             }
         }
         return true;

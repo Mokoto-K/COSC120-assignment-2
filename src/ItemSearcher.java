@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
 
 public class ItemSearcher {
 
-    private static final String filePath = "./inventory_v1.txt";
+    private static final String filePath = "./inventory_v2.txt";
     private static final Icon icon = new ImageIcon("./the_greenie_geek.png");
     private static Inventory inventory;
     private static final String appName = "Greenie Geek";
@@ -52,7 +52,15 @@ public class ItemSearcher {
             String potSizesRaw = info[3].replace("],", "");
             String description = info[4].replace("]","");
 
-            String category = singularInfo[0];
+            // Parse in the category of plant from the database
+            // TODO- Fix the error message
+            String category = singularInfo[0].toUpperCase().replace(" ", "_");
+            try {
+                category = CategoryOfFruit.valueOf(category).toString();
+            } catch (Exception e) {
+                System.out.println("Plant not support in CategoryOfFruits enum, check database " + e);
+            }
+
             String productName = singularInfo[1];
             String productCode = singularInfo[2];
             String type = singularInfo[3].trim();
@@ -71,13 +79,14 @@ public class ItemSearcher {
             Map<Integer,Float> potSizeToPrice = new LinkedHashMap<>();
             if(potSizesRaw.length()>0) {
                 String[] optionsPotSizes = potSizesRaw.split(",");
+
                 String[] optionsPrices = pricesRaw.split(",");
                 for (int j=0;j<optionsPrices.length;j++){
                     int potSize = 0;
                     float price = 0f;
                     try {
-                        potSize = Integer.parseInt(optionsPotSizes[j]);
-                        price = Float.parseFloat(optionsPrices[j]);
+                        potSize = Integer.parseInt(optionsPotSizes[j].trim());
+                        price = Float.parseFloat(optionsPrices[j].trim());
                     } catch (IllegalArgumentException e) {
                         System.out.println("Error in file. Pot size/price option could not be parsed for item on line " + (i + 1) + ". Terminating. \nError message: " + e.getMessage());
                         System.exit(0);
@@ -120,14 +129,14 @@ public class ItemSearcher {
         Map<Filters, Object> usersDreamPlant = new LinkedHashMap<>();
 
         // First asking the user what type of plant they are looking to buy
-        String category = (String) JOptionPane.showInputDialog(null, "Please select the type " +
+        CategoryOfFruit category = (CategoryOfFruit) JOptionPane.showInputDialog(null, "Please select the type " +
                 "of plant you'd like to purchase", appName, JOptionPane.QUESTION_MESSAGE, icon, CategoryOfFruit.values(), CategoryOfFruit.CITRUS);
         // adding their selection to the map
         usersDreamPlant.put(Filters.CATEGORY, category);
 
         // Getting the type of fruit the user wants and adding it to the map if their choice is not "NA"
         String type = (String) JOptionPane.showInputDialog(null, "Please select your preferred " +
-                "type", appName, JOptionPane.QUESTION_MESSAGE, icon, inventory.getAllTypes().toArray(new String[0]), null);
+                "type", appName, JOptionPane.QUESTION_MESSAGE, icon, inventory.getAllTypes(category.toString()).toArray(), null);
         if (type == null) System.exit(0);
 
         if (!type.equalsIgnoreCase("na")) {
@@ -136,9 +145,9 @@ public class ItemSearcher {
 
         // TODO - Potential change to "I don't mind" and not NA
         // Getting the customers choice of dwarf plant or not only if they didn't select vine
-        if (!category.equalsIgnoreCase(String.valueOf(CategoryOfFruit.VINE))) {
+        if (!category.toString().equalsIgnoreCase(String.valueOf(CategoryOfFruit.VINE))) {
             String dwarf = (String) JOptionPane.showInputDialog(null, "Would you like a dwarf tree?",
-                    appName, JOptionPane.QUESTION_MESSAGE, icon, inventory.getAllDwarfs().toArray(new String[0]), null);
+                    appName, JOptionPane.QUESTION_MESSAGE, icon, inventory.getAllDwarfs(category.toString()).toArray(), null);
             if (dwarf == null) System.exit(0);
 
             if (!type.equalsIgnoreCase("na")) {
@@ -146,9 +155,9 @@ public class ItemSearcher {
             }
         }
         // Only asking the customer what training system they would like if they chose vine as their category of plant
-        if (category.equalsIgnoreCase(String.valueOf(CategoryOfFruit.VINE))) {
+        if (category.toString().equalsIgnoreCase(String.valueOf(CategoryOfFruit.VINE))) {
             String trainingSystem = (String) JOptionPane.showInputDialog(null, "What type of training system would you like for your vine?",
-                    appName, JOptionPane.QUESTION_MESSAGE, icon, inventory.getAllTrellis().toArray(new String[0]), null);
+                    appName, JOptionPane.QUESTION_MESSAGE, icon, inventory.getAllTrellis(category.toString()).toArray(), null);
             if (trainingSystem == null) System.exit(0);
 
             if (!trainingSystem.equalsIgnoreCase("na")) {
@@ -159,14 +168,14 @@ public class ItemSearcher {
         Set<String> tempPollinators = new HashSet<>();
 
         // Getting the pollinators for category choices, STONE or POME, otherwise skipping this step
-        if (category.equalsIgnoreCase(String.valueOf(CategoryOfFruit.POME)) || category.equalsIgnoreCase(String.valueOf(CategoryOfFruit.STONE_FRUIT))) {
+        if (category.toString().equalsIgnoreCase(String.valueOf(CategoryOfFruit.POME)) || category.toString().equalsIgnoreCase(String.valueOf(CategoryOfFruit.STONE_FRUIT))) {
 
             // Create a loop to continue asking the customer to choose a pollinator until they skip or reply no to add another
             int decision = 0;
             while (decision == 0) {
 
                 String pollinator = (String) JOptionPane.showInputDialog(null, "What type of training system would you like for your vine?",
-                        appName, JOptionPane.QUESTION_MESSAGE, icon, inventory.getAllPollinators().toArray(new String[0]), null);
+                        appName, JOptionPane.QUESTION_MESSAGE, icon, inventory.getAllPollinators(category.toString()).toArray(), null);
 
                 if (pollinator == null) System.exit(0);
 
@@ -190,10 +199,13 @@ public class ItemSearcher {
 
         int potSize = 7;
         while (potSize < 8) {
-            String userInput = (String) JOptionPane.showInputDialog(null, "What size pot would you like? Options are even numbers from 8 - 16inch", appName, JOptionPane.QUESTION_MESSAGE, icon, null, null);
+            String userInput = (String) JOptionPane.showInputDialog(null, "What size pot would" +
+                    " you like? Options are even numbers from 8 - 16inch", appName, JOptionPane.QUESTION_MESSAGE, icon,
+                    null, null);
+
             if (userInput == null) System.exit(0);
             try {
-                potSize = Integer.parseInt((String) JOptionPane.showInputDialog(null, "Pot size (inch)? **min 8 inch", appName, JOptionPane.QUESTION_MESSAGE, icon, null, null));
+                potSize = Integer.parseInt((userInput));
                 if (potSize < 7)
                     JOptionPane.showMessageDialog(null, "Pot size must be at least 8", appName, JOptionPane.ERROR_MESSAGE);
             } catch (NumberFormatException e) {
@@ -235,13 +247,14 @@ public class ItemSearcher {
             Map<String, FruitingPlant> options = new HashMap<>();
             StringBuilder infoToShow = new StringBuilder("Matches found!! The following citrus trees meet your criteria: \n");
             for (FruitingPlant match : matching) {
-                infoToShow.append(match.getItemInformation());
+                // TODO - this was meant to just put a map in a tostring method, I dont know if this is a solution yet
+                infoToShow.append(match.getItemInformation(match.getDreamPlant().getAllFilters()));
                 options.put(match.getProductName(), match);
             }
             String choice = (String) JOptionPane.showInputDialog(null, infoToShow + "\n\nPlease select which item you'd like to order:", appName, JOptionPane.INFORMATION_MESSAGE, icon, options.keySet().toArray(), "");
             if(choice == null) System.exit(0);
             FruitingPlant chosenTree = options.get(choice);
-            submitOrder(getContactInfo(),chosenTree, dreamFruitingPlant.getPotSize());
+//            submitOrder(getContactInfo(),chosenTree, dreamFruitingPlant.getPotSize());
             JOptionPane.showMessageDialog(null,"Thank you! Your order has been submitted. Please head to your local Greenie Geek to pay and pick up!",appName, JOptionPane.INFORMATION_MESSAGE);
         }
         else{

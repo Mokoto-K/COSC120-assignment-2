@@ -1,10 +1,12 @@
+import java.util.Map;
+
 /**
  * @author -
  * Email -
  * created for COSC120 Assignment 2
  * Add descriptor
  */
-
+// TODO Change this to a record
 public class FruitingPlant {
     //fields
     private final String productCode;
@@ -75,10 +77,10 @@ public class FruitingPlant {
 //        this.minPrice=minPrice;
 //    }
 
-    public StringBuilder getItemInformation() {
+    public StringBuilder getItemInformation(Map<Filters, Object> filters) {
         StringBuilder output = new StringBuilder("\n*******************************************");
         output.append("\n").append(getProductName()).append(" (").append(getProductCode()).append(")\n")
-                .append(getDescription()).append("\nDwarf: ").append(this.getDreamPlant().getDreamPlantInformation());
+                .append(getDescription()).append("\nDwarf: ").append(this.getDreamPlant().getDreamPlantInformation(filters));
         return output;
     }
 
