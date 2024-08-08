@@ -47,7 +47,7 @@ public class Inventory {
                 allDwarfs.add(fruitingPlant.getDreamPlant().getFilter(Filters.DWARF).toString());
             }
         }
-        allDwarfs.add("NA");
+        allDwarfs.add("I don't mind");
 
         return allDwarfs;
     }
@@ -70,7 +70,10 @@ public class Inventory {
 
         for(FruitingPlant fruitingPlant : inventory){
             if (fruitingPlant.getDreamPlant().getFilter(Filters.CATEGORY).equals(category)) {
-                allPollinators.add(fruitingPlant.getDreamPlant().getFilter(Filters.POLLINATORS).toString());
+                String[] pollinatorsList = fruitingPlant.getDreamPlant().getFilter(Filters.POLLINATORS).toString().split(",");
+                for(String p : pollinatorsList) {
+                    allPollinators.add(p.replace("]","").replace("[","").trim());
+                }
             }
         }
         allPollinators.add("NA");

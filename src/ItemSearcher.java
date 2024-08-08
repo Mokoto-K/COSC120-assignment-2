@@ -65,7 +65,7 @@ public class ItemSearcher {
             String productCode = singularInfo[2];
             String type = singularInfo[3].trim();
 
-            boolean dwarf = singularInfo[4].equalsIgnoreCase("yes");
+            String dwarf = singularInfo[4].trim();
             String trainingSystem = singularInfo[5];
 
             // Create a list for our pollinators
@@ -73,7 +73,9 @@ public class ItemSearcher {
             // TODO perhaps add a try catch for this iteration specifically look at price below for example
             if (!pollinatorsRaw.isEmpty()) {
                 String[] pollinatorOptions = pollinatorsRaw.split(",");
-                pollinatorList.addAll(Arrays.asList(pollinatorOptions));
+                for (String p : pollinatorOptions) {
+                    pollinatorList.add(p.replace("[", "").replace("]", "").trim());
+                }
             }
 
             Map<Integer,Float> potSizeToPrice = new LinkedHashMap<>();
@@ -105,10 +107,13 @@ public class ItemSearcher {
             filterMap.put(Filters.POLLINATORS, pollinatorList);
             // TODO we might not need this, but putting it in for now just incase, everything to to with just the pot
             //  sizes, not the price
-            List<String> potSizeList = new ArrayList<>();
+            List<Integer> potSizeList = new ArrayList<>();
             if(potSizesRaw.length()>0) {
                 String[] optionsPotSizes = potSizesRaw.split(",");
-                potSizeList.addAll(Arrays.asList(optionsPotSizes));
+                for (String pSize : optionsPotSizes) {
+                    int potS = Integer.parseInt(pSize.trim());
+                    potSizeList.add(potS);
+                }
             }
             filterMap.put(Filters.POT_SIZE, potSizeList);
             filterMap.put(Filters.POT_SIZE_PRICE, potSizeToPrice);
@@ -132,7 +137,7 @@ public class ItemSearcher {
         CategoryOfFruit category = (CategoryOfFruit) JOptionPane.showInputDialog(null, "Please select the type " +
                 "of plant you'd like to purchase", appName, JOptionPane.QUESTION_MESSAGE, icon, CategoryOfFruit.values(), CategoryOfFruit.CITRUS);
         // adding their selection to the map
-        usersDreamPlant.put(Filters.CATEGORY, category);
+        usersDreamPlant.put(Filters.CATEGORY, category.toString());
 
         // Getting the type of fruit the user wants and adding it to the map if their choice is not "NA"
         String type = (String) JOptionPane.showInputDialog(null, "Please select your preferred " +
@@ -150,7 +155,7 @@ public class ItemSearcher {
                     appName, JOptionPane.QUESTION_MESSAGE, icon, inventory.getAllDwarfs(category.toString()).toArray(), null);
             if (dwarf == null) System.exit(0);
 
-            if (!type.equalsIgnoreCase("na")) {
+            if (!dwarf.equalsIgnoreCase("I don't mind")) {
                 usersDreamPlant.put(Filters.DWARF, dwarf);
             }
         }
@@ -174,7 +179,7 @@ public class ItemSearcher {
             int decision = 0;
             while (decision == 0) {
 
-                String pollinator = (String) JOptionPane.showInputDialog(null, "What type of training system would you like for your vine?",
+                String pollinator = (String) JOptionPane.showInputDialog(null, "Would you like to add any pollinators",
                         appName, JOptionPane.QUESTION_MESSAGE, icon, inventory.getAllPollinators(category.toString()).toArray(), null);
 
                 if (pollinator == null) System.exit(0);
@@ -248,7 +253,7 @@ public class ItemSearcher {
             StringBuilder infoToShow = new StringBuilder("Matches found!! The following citrus trees meet your criteria: \n");
             for (FruitingPlant match : matching) {
                 // TODO - this was meant to just put a map in a tostring method, I dont know if this is a solution yet
-                infoToShow.append(match.getItemInformation(match.getDreamPlant().getAllFilters()));
+                infoToShow.append(match.getItemInformation(dreamFruitingPlant.getAllFilters()));
                 options.put(match.getProductName(), match);
             }
             String choice = (String) JOptionPane.showInputDialog(null, infoToShow + "\n\nPlease select which item you'd like to order:", appName, JOptionPane.INFORMATION_MESSAGE, icon, options.keySet().toArray(), "");

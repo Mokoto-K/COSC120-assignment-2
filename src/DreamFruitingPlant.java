@@ -10,17 +10,20 @@ import java.util.*;
 
 public class DreamFruitingPlant {
 
-    private final float maxPrice;
-    private final float minPrice;
+    private float maxPrice;
+    private float minPrice;
     private final Map<Filters,Object> filters;
 
     // TODO add pollinators and training
     public DreamFruitingPlant(Map<Filters,Object> filters, float maxPrice, float minPrice){
-        if (filters==null) {
-            this.filters = new LinkedHashMap<>();
-        } else {
-            this.filters = new HashMap<>(filters);
-        }
+        // TODO - whited out becuase in seek a geek this is used, but in pet app its not, not sure what should be in final
+//        if (filters==null) {
+//            this.filters = new LinkedHashMap<>();
+//        } else {
+//            this.filters = new HashMap<>(filters);
+//        }
+
+        this.filters = new HashMap<>(filters);
         this.maxPrice = maxPrice;
         this.minPrice = minPrice;
     }
@@ -31,14 +34,12 @@ public class DreamFruitingPlant {
      * @param filters a
      */
     public DreamFruitingPlant(Map<Filters, Object> filters) {
-        if (filters==null) {
-            this.filters = new LinkedHashMap<>();
-        } else {
-            this.filters = new HashMap<>(filters);
-        }
-        // TODO will have to fix this at some point
-        maxPrice =-1;
-        minPrice = -1;
+//        if (filters==null) {
+//            this.filters = new LinkedHashMap<>();
+//        } else {
+//            this.filters = new HashMap<>(filters);
+//        }
+        this.filters = new HashMap<>(filters);
     }
 
     // TODO fill in this explainor after when it makes more sense
@@ -56,12 +57,25 @@ public class DreamFruitingPlant {
     public float getMinPrice() {return minPrice;}
 
 // TODO - The structure of the string will need to change once I can run the program
-    public StringBuilder getDreamPlantInformation(Map<Filters, Object> filters) {
+    public String getDreamPlantInformation(Map<Filters, Object> filters) {
+
         StringBuilder sb = new StringBuilder();
         for (Filters key : filters.keySet()) {
-            sb.append("\n").append(key).append(" : ").append(getFilter(key));
+            // Check if the keyset is a collection, if so, this means it's a list and there are multiple values to be
+            // displayed, therefore iterate through all the values and append them to the string builder differently
+            if (this.getFilter(key) instanceof Collection<?>) {
+                sb.append("\n").append(key).append(" : ");
+                // for every values in the collection, append with a '|' between
+                for (Object obj : ((Collection<?>) this.getFilter(key)).toArray()) {
+                    sb.append(obj).append(" | ");
+                }
+            }
+            else {
+                // Append the key and the values to the string builder
+                sb.append("\n").append(key).append(" : ").append(getFilter(key));
+            }
         }
-        return sb;
+        return sb.toString();
 //        DecimalFormat df = new DecimalFormat("0.00");
 //        sb.append(isDwarf() ? "Yes" : "No")
 //                .append("\nAvailable pot sizes:\n| ");
@@ -73,52 +87,50 @@ public class DreamFruitingPlant {
     }
 
     // TODO - You have to try your hardest to implement exactly what this is doing, but in a more naturally you way
-    // I didnt write thie, so im uneasy with it.
+    // I didn't write this, so im uneasy with it.
     public boolean compareDreamPlants(DreamFruitingPlant dreamFruitingPlant) {
         System.out.println(dreamFruitingPlant.getAllFilters());
         System.out.println(this.getAllFilters());
-
-
 
         for (Filters key : dreamFruitingPlant.getAllFilters().keySet()) {
 
 //            if (this.getFilter(key).equals(dreamFruitingPlant.getFilter(key).toString()))
 //                return true;
 
-
-            System.out.println(key);
+//            System.out.println(key);
             if (this.getAllFilters().containsKey(key)) {
-                System.out.println("1");
+//                System.out.println("1");
 
                 if (this.getFilter(key) instanceof Collection<?> && dreamFruitingPlant.getFilter(key) instanceof Collection<?>) {
                     Set<Object> intersect = new HashSet<>((Collection<?>) dreamFruitingPlant.getFilter(key));
                     intersect.retainAll((Collection<?>) dreamFruitingPlant.getFilter(key));
-                    System.out.println("2");
+//                    System.out.println("2");
                     if (intersect.isEmpty()) return false;
                 }
 
                 // I added this elif, might need to be deleted
                 else if (this.getFilter(key) instanceof Collection<?> && !(dreamFruitingPlant.getFilter(key) instanceof Collection<?>)) {
-                    return true;
-
+                    if (!((Collection<?>) this.getFilter(key)).contains(dreamFruitingPlant.getFilter(key))) {
+                        return false;
+                    }
                 }
 
-
                 else if (dreamFruitingPlant.getFilter(key) instanceof Collection<?> && !(this.getFilter(key) instanceof Collection<?>)) {
-                    System.out.println("3");
+//                    System.out.println("3");
                     if (!((Collection<?>) dreamFruitingPlant.getFilter(key)).contains(this.getFilter(key))) {
 
-                        System.out.println("4");
+//                        System.out.println("4");
                         return false;
                     }
 
                 }
-                else if (!this.getFilter(key).equals(dreamFruitingPlant.getFilter(key).toString())) {
-                    System.out.println(this.getFilter(key).toString());
-                    System.out.println(dreamFruitingPlant.getFilter(key).toString());
-                    System.out.println("5");
+                else if (!this.getFilter(key).equals(dreamFruitingPlant.getFilter(key))) {
+//                    System.out.println(this.getFilter(key).toString());
+//                    System.out.println(dreamFruitingPlant.getFilter(key).toString());
+                    System.out.println(key + " " + this.getFilter(key).getClass() + " " + dreamFruitingPlant.getFilter(key).getClass());
                     return false;
                 }
+                System.out.println(key + " Matched");
             }
         }
         return true;

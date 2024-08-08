@@ -80,7 +80,7 @@ public class FruitingPlant {
     public StringBuilder getItemInformation(Map<Filters, Object> filters) {
         StringBuilder output = new StringBuilder("\n*******************************************");
         output.append("\n").append(getProductName()).append(" (").append(getProductCode()).append(")\n")
-                .append(getDescription()).append("\nDwarf: ").append(this.getDreamPlant().getDreamPlantInformation(filters));
+                .append(getDescription()).append(getDreamPlant().getDreamPlantInformation(filters));
         return output;
     }
 
