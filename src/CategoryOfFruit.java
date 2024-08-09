@@ -5,6 +5,7 @@
  * Add descriptor
  */
 
+// an enum class that represents all the different categories of fruiting plants from the database
 public enum CategoryOfFruit {
     POME, VINE, CITRUS, STONE_FRUIT;
 

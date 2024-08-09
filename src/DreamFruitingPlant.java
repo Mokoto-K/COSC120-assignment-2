@@ -15,7 +15,7 @@ public class DreamFruitingPlant {
     private final Map<Filters,Object> filters;
 
     // TODO add pollinators and training
-    public DreamFruitingPlant(Map<Filters,Object> filters, float maxPrice, float minPrice){
+    public DreamFruitingPlant(Map<Filters,Object> filters, float minPrice, float maxPrice){
         // TODO - whited out becuase in seek a geek this is used, but in pet app its not, not sure what should be in final
 //        if (filters==null) {
 //            this.filters = new LinkedHashMap<>();
@@ -24,8 +24,8 @@ public class DreamFruitingPlant {
 //        }
 
         this.filters = new HashMap<>(filters);
-        this.maxPrice = maxPrice;
         this.minPrice = minPrice;
+        this.maxPrice = maxPrice;
     }
 
     // TODO Figure out what its returning when I can actually run the program, same for the getter below
@@ -148,101 +148,4 @@ public class DreamFruitingPlant {
         }
         return true;
     }
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-// FOR SAFE KEEPING BEFORE I NUKE THIS CLASS, WILL DELETE WHEN THE TIME COMES
-
-import java.text.DecimalFormat;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-public class DreamFruitingPlant {
-
-    private final String type;
-    private final boolean dwarf;
-    private final int potSize;
-    private final Map<Integer,Float> potSizeToPrice;
-    private final String trainingSystem;
-    private final List<String> pollinators;
-    private final float maxPrice;
-    private final float minPrice;
-    private final Map<Filters,Object> filters;
-
-    // TODO add pollinators and training
-    public DreamFruitingPlant(String type, boolean dwarf, int potSize, Map<Integer,Float> potSizeToPrice, float maxPrice, float minPrice){
-
-        this.type = type;
-        this.dwarf = dwarf;
-        this.potSize = potSize;
-        this.potSizeToPrice = potSizeToPrice;
-        this.maxPrice = maxPrice;
-        this.minPrice = minPrice;
-    }
-
-    // TODO fill this in once youve initiated it properly and it has a function.
-
-    public DreamFruitingPlant(int maxPrice, int minPrice) {
-        this.maxPrice = maxPrice;
-        this.minPrice = minPrice;
-    }
-    // TODO Figure out what its returning when I can actually run the program, same for the getter below
-
-    public DreamFruitingPlant(Map<Filters, Object> filters) {
-        this.filters = new HashMap<>(filters);
-    }
-
-    public Map<Filters, Object> getFilters() {return filters; }
-
-    public String getType() {return type;}
-
-    public boolean isDwarf() {return dwarf;}
-
-    public int getPotSize() {return potSize;}
-
-    public Map<Integer, Float> getPotSizeToPrice() {return potSizeToPrice;}
-
-    public float getMaxPrice() {return maxPrice;}
-
-    public float getMinPrice() {return minPrice;}
-    // TODO - Turn this into just a string, also do the same with other classes with descriptiuons
-    public StringBuilder getDreamPlantInformation() {
-        StringBuilder sb = new StringBuilder();
-        DecimalFormat df = new DecimalFormat("0.00");
-        sb.append(isDwarf() ? "Yes" : "No")
-                .append("\nAvailable pot sizes:\n| ");
-        for (Integer potSize: potSizeToPrice.keySet()) {
-            sb.append(potSize).append("inch: $").append(df.format(potSizeToPrice.get(potSize))).append(" | ");
-        }
-        sb.append("\n\n");
-        return sb;
-    }
-
-    public boolean compareDreamPlants(DreamFruitingPlant dreamFruitingPlant) {
-        if(!this.getType().equals(dreamFruitingPlant.getType())) return false;
-        if(!this.getPotSizeToPrice().containsKey(dreamFruitingPlant.getPotSize())) return false;
-        if(this.isDwarf() != dreamFruitingPlant.isDwarf()) return false;
-        return true;
-    }
-
-}
-
-
-
-
- */

@@ -18,7 +18,7 @@ public class Inventory {
     public List<FruitingPlant> findMatch(DreamFruitingPlant dreamFruitingPlant){
         List<FruitingPlant> matching = new ArrayList<>();
         for(FruitingPlant fruitingPlant : inventory){
-            if (!fruitingPlant.getDreamPlant().compareDreamPlants(dreamFruitingPlant)) continue;
+            if (!fruitingPlant.dreamFruitingPlant().compareDreamPlants(dreamFruitingPlant)) continue;
 //            Float correspondingPrice = fruitingPlant.getDreamPlant().getPotSizeToPrice().get(dreamFruitingPlant.getPotSize());
 //            if(correspondingPrice < dreamFruitingPlant.getMinPrice() || correspondingPrice > dreamFruitingPlant.getMaxPrice()) continue;
             matching.add(fruitingPlant);
@@ -31,36 +31,22 @@ public class Inventory {
     public Set<String> getAllTypes(String category){
         Set<String> allTypes = new LinkedHashSet<>();
         for(FruitingPlant fruitingPlant : inventory){
-            if (fruitingPlant.getDreamPlant().getFilter(Filters.CATEGORY).equals(category)) {
-                allTypes.add(fruitingPlant.getDreamPlant().getFilter(Filters.TYPE).toString());
+            if (fruitingPlant.dreamFruitingPlant().getFilter(Filters.CATEGORY).equals(category)) {
+                allTypes.add(fruitingPlant.dreamFruitingPlant().getFilter(Filters.TYPE).toString());
             }
         }
-        allTypes.add("I don't mind");
+        allTypes.add("SKIP (any will do)");
         return allTypes;
-    }
-
-    public Set<String> getAllDwarfs(String category){
-        Set<String> allDwarfs = new LinkedHashSet<>();
-
-        for(FruitingPlant fruitingPlant : inventory){
-            if (fruitingPlant.getDreamPlant().getFilter(Filters.CATEGORY).equals(category)) {
-                allDwarfs.add(fruitingPlant.getDreamPlant().getFilter(Filters.DWARF).toString());
-            }
-        }
-        allDwarfs.add("I don't mind");
-
-        return allDwarfs;
     }
 
     public Set<String> getAllTrellis(String category){
         Set<String> allTrellis = new LinkedHashSet<>();
-
         for(FruitingPlant fruitingPlant : inventory){
-            if (fruitingPlant.getDreamPlant().getFilter(Filters.CATEGORY).equals(category)) {
-                allTrellis.add(fruitingPlant.getDreamPlant().getFilter(Filters.TRAINING_SYSTEM).toString());
+            if (fruitingPlant.dreamFruitingPlant().getFilter(Filters.CATEGORY).equals(category)) {
+                allTrellis.add(fruitingPlant.dreamFruitingPlant().getFilter(Filters.TRAINING_SYSTEM).toString());
             }
         }
-        allTrellis.add("I don't mind");
+        allTrellis.add("SKIP (any will do)");
 
         return allTrellis;
     }
@@ -69,14 +55,14 @@ public class Inventory {
         Set<String> allPollinators = new LinkedHashSet<>();
 
         for(FruitingPlant fruitingPlant : inventory){
-            if (fruitingPlant.getDreamPlant().getFilter(Filters.CATEGORY).equals(category)) {
-                String[] pollinatorsList = fruitingPlant.getDreamPlant().getFilter(Filters.POLLINATORS).toString().split(",");
+            if (fruitingPlant.dreamFruitingPlant().getFilter(Filters.CATEGORY).equals(category)) {
+                String[] pollinatorsList = fruitingPlant.dreamFruitingPlant().getFilter(Filters.POLLINATORS).toString().split(",");
                 for(String p : pollinatorsList) {
                     allPollinators.add(p.replace("]","").replace("[","").trim());
                 }
             }
         }
-        allPollinators.add("I don't mind");
+        allPollinators.add("SKIP (any will do)");
 
         return allPollinators;
     }

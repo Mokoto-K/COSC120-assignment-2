@@ -14,9 +14,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ItemSearcher {
-    // TODO - turn fruiting plant into a record
-    // TODO - turn Dwarf into enum
-    // TODO - method for price input
+    // TODO Price comparison
     // TODO - getting users data
     // TODO - creating the output file
     private static final String filePath = "./inventory_v2.txt";
@@ -149,7 +147,7 @@ public class ItemSearcher {
         if (type == null) System.exit(0);
 
         // Control structure for all types, if user wants a specific type, add it to the map
-        if (!type.equalsIgnoreCase("I don't mind")) {
+        if (!type.equalsIgnoreCase("SKIP (any will do)")) {
             usersDreamPlant.put(Filters.TYPE, type);
         } else {
             // If the user doesn't mind what type, add all types to the map
@@ -157,78 +155,82 @@ public class ItemSearcher {
             usersDreamPlant.put(Filters.TYPE, allTypes);
         }
 
-
         // TODO - Potential change to "I don't mind" and not NA
-        // Getting the customers choice of dwarf plant or not only if they didn't select vine
-        if (!category.toString().equalsIgnoreCase(String.valueOf(CategoryOfFruit.VINE))) {
-            String dwarf = (String) JOptionPane.showInputDialog(null, "Would you like a dwarf tree?",
-                    appName, JOptionPane.QUESTION_MESSAGE, icon, inventory.getAllDwarfs(category.toString()).toArray(), null);
+        // Filtering questions for if the customer did not choose vine for their plant
+        if (!(category==CategoryOfFruit.VINE)) {
+            Dwarf dwarf = (Dwarf) JOptionPane.showInputDialog(null, "Would you like a dwarf plant?",
+                    appName, JOptionPane.QUESTION_MESSAGE, icon, Dwarf.values(), Dwarf.YES);
+
             if (dwarf == null) System.exit(0);
 
             // Control structure for dwarf choice, if the user selects yes or no, just add that string
-            if (!dwarf.equalsIgnoreCase("I don't mind")) {
+            if (!(dwarf==Dwarf.NA)) {
                 usersDreamPlant.put(Filters.DWARF, dwarf);
             }
             // If the user doesn't care about the tree being dwarf, just add all options to the dreamFruitPlant
             else {
-                // Get all options into a collection
-                List<String> allDwarfs = new ArrayList<>(inventory.getAllDwarfs(category.toString()));
+                // Declare a list to hold the options
+                List<String> allDwarfs = new ArrayList<>();
+                // Iterate through all values of the Dwarf enum adding each value to the list
+                for (Dwarf d : Dwarf.values()){
+                    allDwarfs.add(d.toString().toLowerCase());
+                }
                 // Put the collection into the map
                 usersDreamPlant.put(Filters.DWARF, allDwarfs);
             }
 
-        }
-        // Only asking the customer what training system they would like if they chose vine as their category of plant
-        if (category.toString().equalsIgnoreCase(String.valueOf(CategoryOfFruit.VINE))) {
+            // if the category also wasn't citrus
+            if (!(category==CategoryOfFruit.CITRUS)) {
+                // Create a Set to store all pollinators, we are using a set to stop duplicates from appearing
+                Set<String> listOfPollinators = new HashSet<>();
+
+                // Create a loop to continue asking the customer to choose a pollinator until they skip or reply no to add another
+                int decision = 0;
+                while (decision == 0) {
+                    // Obtaining the users choice of pollinator
+                    String pollinator = (String) JOptionPane.showInputDialog(null, "Would you like to add any pollinators",
+                            appName, JOptionPane.QUESTION_MESSAGE, icon, inventory.getAllPollinators(category.toString()).toArray(), null);
+
+                    // Handling the null pointer error
+                    if (pollinator == null) System.exit(0);
+
+                    // if the customer selects a pollinator, add it to the list
+                    if (!pollinator.equalsIgnoreCase("SKIP (any will do)")) {
+                        listOfPollinators.add(pollinator);
+                    } else {
+                        // If the user doesn't mind what pollinator, add all pollinators to the map and break out of the loop
+                        Set<String> allPollinators = new HashSet<>(inventory.getAllPollinators(category.toString()));
+                        usersDreamPlant.put(Filters.POLLINATORS, allPollinators);
+                        // clearing the list of Pollinators list in-case the user selected a pollinator and wanted to choose a
+                        // second, then changed their mind on the second go around, prevents two sets getting added to the map.
+                        listOfPollinators.clear();
+                        break;
+                    }
+                    // Ask the customer if they would like to add another pollinator, then run through it all again
+                    decision = JOptionPane.showConfirmDialog(null, "Would you like to add another pollinator",
+                            appName, JOptionPane.YES_NO_OPTION);
+                }
+                // If they chose to add at least one pollinator, add it to the map
+                if (!listOfPollinators.isEmpty()) {
+                    usersDreamPlant.put(Filters.POLLINATORS, listOfPollinators);
+                }
+            }
+        } else {
+            // Only asking the customer what training system they would like if they chose vine as their category of plant
             String trainingSystem = (String) JOptionPane.showInputDialog(null, "What type of training system would you like for your vine?",
                     appName, JOptionPane.QUESTION_MESSAGE, icon, inventory.getAllTrellis(category.toString()).toArray(), null);
+
+            // Handling the null pointer error
             if (trainingSystem == null) System.exit(0);
 
             // Control structure for all trellis, if user wants a specific trellis, add it to the map
-            if (!type.equalsIgnoreCase("I don't mind")) {
+            if (!type.equalsIgnoreCase("SKIP (any will do)")) {
                 usersDreamPlant.put(Filters.TRAINING_SYSTEM, type);
             } else {
-                // If the user doesnt mind what trellis, add all types to the map
+                // If the user doesn't mind what trellis, add all types to the map
                 List<String> allTrellis = new ArrayList<>(inventory.getAllTrellis(category.toString()));
                 usersDreamPlant.put(Filters.TRAINING_SYSTEM, allTrellis);
             }
-        }
-        // Create a Set to store all pollinators, we are using a set to stop duplicates from appearing
-        Set<String> tempPollinators = new HashSet<>();
-
-        // Getting the pollinators for category choices, STONE or POME, otherwise skipping this step
-        if (category.toString().equalsIgnoreCase(String.valueOf(CategoryOfFruit.POME)) || category.toString().equalsIgnoreCase(String.valueOf(CategoryOfFruit.STONE_FRUIT))) {
-
-            // Create a loop to continue asking the customer to choose a pollinator until they skip or reply no to add another
-            int decision = 0;
-            while (decision == 0) {
-
-                String pollinator = (String) JOptionPane.showInputDialog(null, "Would you like to add any pollinators",
-                        appName, JOptionPane.QUESTION_MESSAGE, icon, inventory.getAllPollinators(category.toString()).toArray(), null);
-
-                if (pollinator == null) System.exit(0);
-
-                // if the customer selects a pollinator, add it to the list
-                if (!pollinator.equalsIgnoreCase("I don't mind")) {
-                    tempPollinators.add(pollinator);
-                } else {
-                    // If the user doesn't mind what pollinator, add all pollinators to the map and break out of the loop
-                    Set<String> allPollinators = new HashSet<>(inventory.getAllPollinators(category.toString()));
-                    usersDreamPlant.put(Filters.POLLINATORS, allPollinators);
-                    // clearing the temp Pollinators list in-case the user selected a pollinator and wanted to choose a
-                    // second, then changed their mind on the second go around, prevents two sets getting added to the map.
-                    tempPollinators.clear();
-                    break;
-                }
-
-                // Ask the customer if they would like to add another pollinator, then run through it all again
-                decision = JOptionPane.showConfirmDialog(null, "Would you like to add another pollinator",
-                        appName, JOptionPane.YES_NO_OPTION);
-            }
-        }
-        // If they chose to add at least one pollinator, add it to the map
-        if (!tempPollinators.isEmpty()) {
-            usersDreamPlant.put(Filters.POLLINATORS, tempPollinators);
         }
 
         int potSize = 7;
@@ -249,31 +251,54 @@ public class ItemSearcher {
 
         usersDreamPlant.put(Filters.POT_SIZE, potSize);
 
+        // Call the price values function to get the customers minimum and maximum prices they want
+        int[] price = priceValues();
+
+        return new DreamFruitingPlant(usersDreamPlant, price[0], price[1]);
+    }
+
+    /**
+     * Asks the customer what the minimium and maximum prices they want to pay for a plant, it then
+     * assigns these two values to an int array
+     * @return an int array containing the maximum and minimum prices the customer has selected to pay
+     */
+    private static int[] priceValues() {
+        // Set the two variables
         int minPrice = -1, maxPrice = -1;
+        // Continue to ask the user to enter a min price until they enter a value ≥ 0
         while (minPrice < 0) {
             String userInput = (String) JOptionPane.showInputDialog(null, "Enter min price range value:", appName, JOptionPane.QUESTION_MESSAGE, icon, null, null);
+            // Handle null pointer error
             if (userInput == null) System.exit(0);
+            // Try to parse the string as an int
             try {
                 minPrice = Integer.parseInt(userInput);
+                // Check the int doesn't meet our expectations
                 if (minPrice < 0)
                     JOptionPane.showMessageDialog(null, "Price must be >= 0.", appName, JOptionPane.ERROR_MESSAGE);
+                // Catch any non number inputs
             } catch (NumberFormatException e) {
                 JOptionPane.showMessageDialog(null, "Invalid input. Please try again.", appName, JOptionPane.ERROR_MESSAGE);
             }
         }
+        // Continue to ask the user to enter a max price until they enter a value > the min price
         while (maxPrice < minPrice) {
             String userInput = (String) JOptionPane.showInputDialog(null, "Enter max price range value:", appName, JOptionPane.QUESTION_MESSAGE, icon, null, null);
+            // Handle null pointer error
             if (userInput == null) System.exit(0);
+            // Try to parse the string as an int
             try {
                 maxPrice = Integer.parseInt(userInput);
+                // Check the int doesn't meet our expectations
                 if (maxPrice < minPrice)
                     JOptionPane.showMessageDialog(null, "Price must be >= " + minPrice, appName, JOptionPane.ERROR_MESSAGE);
+                // Catch any non number inputs
             } catch (NumberFormatException e) {
                 JOptionPane.showMessageDialog(null, "Invalid input. Please try again.", appName, JOptionPane.ERROR_MESSAGE);
             }
         }
-
-        return new DreamFruitingPlant(usersDreamPlant, maxPrice, minPrice);
+        // Return the two values as an int array
+        return new int[]{minPrice, maxPrice};
     }
 
     private static void processSearchResults(DreamFruitingPlant dreamFruitingPlant){
@@ -283,8 +308,8 @@ public class ItemSearcher {
             StringBuilder infoToShow = new StringBuilder("Matches found!! The following citrus trees meet your criteria: \n");
             for (FruitingPlant match : matching) {
                 // TODO - this was meant to just put a map in a tostring method, I dont know if this is a solution yet
-                infoToShow.append(match.getItemInformation(dreamFruitingPlant.getAllFilters()));
-                options.put(match.getProductName(), match);
+                infoToShow.append(match.toString(dreamFruitingPlant.getAllFilters()));
+                options.put(match.productName(), match);
             }
             String choice = (String) JOptionPane.showInputDialog(null, infoToShow + "\n\nPlease select which item you'd like to order:", appName, JOptionPane.INFORMATION_MESSAGE, icon, options.keySet().toArray(), "");
             if(choice == null) System.exit(0);
@@ -314,11 +339,11 @@ public class ItemSearcher {
     }
 
     private static void submitOrder(Customer customer, FruitingPlant fruitingPlant, int potSize) {
-        String filePath = customer.name().replace(" ", "_") + "_" + fruitingPlant.getProductCode() + ".txt";
+        String filePath = customer.name().replace(" ", "_") + "_" + fruitingPlant.productCode() + ".txt";
         Path path = Path.of(filePath);
         String lineToWrite = "Order details:" +
                 "\n\tName: " + customer.name() + " ("+customer.phoneNumber() +")"+
-                "\n\tItem: " + fruitingPlant.getProductName() + " (" + fruitingPlant.getProductCode() + ")" +
+                "\n\tItem: " + fruitingPlant.productName() + " (" + fruitingPlant.productCode() + ")" +
                 "\n\tPot size (inch): "+potSize;
 
         try {

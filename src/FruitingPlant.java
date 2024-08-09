@@ -1,86 +1,26 @@
 import java.util.Map;
-
 /**
  * @author -
  * Email -
  * created for COSC120 Assignment 2
  * Add descriptor
  */
-// TODO Change this to a record
-public class FruitingPlant {
-    //fields
-    private final String productCode;
-    private final String productName;
-    private final String description;
-    private final DreamFruitingPlant dreamFruitingPlant;
-//    private final String type;
-//    private final boolean dwarf;
-//    private final Map<Integer,Float> potSizeToPrice;
-//    private float maxPrice;
-//    private float minPrice;
-//    private final int potSize;
+// A record class representing Fruiting plants in the database
+public record FruitingPlant(String productCode, String productName, String description, DreamFruitingPlant dreamFruitingPlant) {
 
-    public FruitingPlant(String productCode, String productName, String description, DreamFruitingPlant dreamFruitingPlant) {
-        this.productCode = productCode;
-        this.productName = productName;
-        this.description = description;
-        this.dreamFruitingPlant = dreamFruitingPlant;
-//        this.type = type;
-//        this.dwarf = dwarf;
-//        this.potSize = potSize;
-//        this.potSizeToPrice = potSizeToPrice;
-    }
-
-    public String getProductCode() {
-        return productCode;
-    }
-
-    public String getProductName() {
-        return productName;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public DreamFruitingPlant getDreamPlant() {return dreamFruitingPlant;}
-
-    //    public String getType() {
-//        return type;
-//    }
-//
-//    public boolean isDwarf() {
-//        return dwarf;
-//    }
-//
-//    public Map<Integer,Float> getPotSizeToPriceOptions() {
-//        return potSizeToPrice;
-//    }
-//
-//    public float getMaxPrice() {
-//        return maxPrice;
-//    }
-//
-//    public float getMinPrice() {
-//        return minPrice;
-//    }
-//
-//    public int getPotSize() {
-//        return potSize;
-//    }
-//
-//    public void setMaxPrice(int maxPrice) {
-//        this.maxPrice=maxPrice;
-//    }
-//
-//    public void setMinPrice(int minPrice) {
-//        this.minPrice=minPrice;
-//    }
-
-    public StringBuilder getItemInformation(Map<Filters, Object> filters) {
+    /**
+     * A to String method for the fruiting plant class, this returns a concatinated string of all the information of
+     * a tree if it matches with a users dream tree.
+     * @param filters a map representing the users dream fruiting plant
+     * @return String - a concatination of all details owned by a given tree.
+     */
+    public StringBuilder toString(Map<Filters, Object> filters) {
+        // Initate the string builder
         StringBuilder output = new StringBuilder("\n*******************************************");
-        output.append("\n").append(getProductName()).append(" (").append(getProductCode()).append(")\n")
-                .append(getDescription()).append(getDreamPlant().getDreamPlantInformation(filters));
+        // Add all fields to the string, calling the dream fruiting plants description method passing in the map to get
+        // the generic details.
+        output.append("\n").append(this.productName()).append(" (").append(this.productCode()).append(")\n")
+                .append(this.description()).append(this.dreamFruitingPlant().getDreamPlantInformation(filters));
         return output;
     }
 

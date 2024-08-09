@@ -5,12 +5,14 @@
  * Add descriptor
  */
 
+// an enum class representing all the generic data values in the database, this is used in combination with a map
+// to perform data abstraction in our program by accessing the keys for the data where ever necessary
 public enum Filters {
     CATEGORY, TYPE, DWARF, TRAINING_SYSTEM, POLLINATORS, POT_SIZE, POT_SIZE_PRICE;
 
-    // TODO fix this god damn description... jeeeezuz
     /**
-     * @return a specific attribute to be used as keys for storage and comparison.
+     * @return a case that represents a specific key in a map that holds all of our
+     * databases attribute values, it is accessed all over our program.
      */
     public String toString() {
         return switch (this) {
@@ -19,7 +21,6 @@ public enum Filters {
             case DWARF -> "Dwarf or not";
             case TRAINING_SYSTEM -> "System for training vines";
             case POLLINATORS -> "Pollinators for fruiting trees";
-            // TODO might not need potsiZe
             case POT_SIZE -> "Size of the pot";
             case POT_SIZE_PRICE -> "Prices for pot sizes";
         };
