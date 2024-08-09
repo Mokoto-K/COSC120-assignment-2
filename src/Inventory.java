@@ -35,7 +35,7 @@ public class Inventory {
                 allTypes.add(fruitingPlant.getDreamPlant().getFilter(Filters.TYPE).toString());
             }
         }
-        allTypes.add("NA");
+        allTypes.add("I don't mind");
         return allTypes;
     }
 
@@ -60,11 +60,11 @@ public class Inventory {
                 allTrellis.add(fruitingPlant.getDreamPlant().getFilter(Filters.TRAINING_SYSTEM).toString());
             }
         }
-        allTrellis.add("NA");
+        allTrellis.add("I don't mind");
 
         return allTrellis;
     }
-
+    // TODO - Change NA to none if you like
     public Set<String> getAllPollinators(String category){
         Set<String> allPollinators = new LinkedHashSet<>();
 
@@ -76,7 +76,7 @@ public class Inventory {
                 }
             }
         }
-        allPollinators.add("NA");
+        allPollinators.add("I don't mind");
 
         return allPollinators;
     }

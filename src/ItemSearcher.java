@@ -14,7 +14,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ItemSearcher {
-
+    // TODO - turn fruiting plant into a record
+    // TODO - turn Dwarf into enum
+    // TODO - method for price input
+    // TODO - getting users data
+    // TODO - creating the output file
     private static final String filePath = "./inventory_v2.txt";
     private static final Icon icon = new ImageIcon("./the_greenie_geek.png");
     private static Inventory inventory;
@@ -144,9 +148,15 @@ public class ItemSearcher {
                 "type", appName, JOptionPane.QUESTION_MESSAGE, icon, inventory.getAllTypes(category.toString()).toArray(), null);
         if (type == null) System.exit(0);
 
-        if (!type.equalsIgnoreCase("na")) {
+        // Control structure for all types, if user wants a specific type, add it to the map
+        if (!type.equalsIgnoreCase("I don't mind")) {
             usersDreamPlant.put(Filters.TYPE, type);
+        } else {
+            // If the user doesn't mind what type, add all types to the map
+            List<String> allTypes = new ArrayList<>(inventory.getAllTypes(category.toString()));
+            usersDreamPlant.put(Filters.TYPE, allTypes);
         }
+
 
         // TODO - Potential change to "I don't mind" and not NA
         // Getting the customers choice of dwarf plant or not only if they didn't select vine
@@ -155,9 +165,18 @@ public class ItemSearcher {
                     appName, JOptionPane.QUESTION_MESSAGE, icon, inventory.getAllDwarfs(category.toString()).toArray(), null);
             if (dwarf == null) System.exit(0);
 
+            // Control structure for dwarf choice, if the user selects yes or no, just add that string
             if (!dwarf.equalsIgnoreCase("I don't mind")) {
                 usersDreamPlant.put(Filters.DWARF, dwarf);
             }
+            // If the user doesn't care about the tree being dwarf, just add all options to the dreamFruitPlant
+            else {
+                // Get all options into a collection
+                List<String> allDwarfs = new ArrayList<>(inventory.getAllDwarfs(category.toString()));
+                // Put the collection into the map
+                usersDreamPlant.put(Filters.DWARF, allDwarfs);
+            }
+
         }
         // Only asking the customer what training system they would like if they chose vine as their category of plant
         if (category.toString().equalsIgnoreCase(String.valueOf(CategoryOfFruit.VINE))) {
@@ -165,8 +184,13 @@ public class ItemSearcher {
                     appName, JOptionPane.QUESTION_MESSAGE, icon, inventory.getAllTrellis(category.toString()).toArray(), null);
             if (trainingSystem == null) System.exit(0);
 
-            if (!trainingSystem.equalsIgnoreCase("na")) {
-                usersDreamPlant.put(Filters.TRAINING_SYSTEM, trainingSystem);
+            // Control structure for all trellis, if user wants a specific trellis, add it to the map
+            if (!type.equalsIgnoreCase("I don't mind")) {
+                usersDreamPlant.put(Filters.TRAINING_SYSTEM, type);
+            } else {
+                // If the user doesnt mind what trellis, add all types to the map
+                List<String> allTrellis = new ArrayList<>(inventory.getAllTrellis(category.toString()));
+                usersDreamPlant.put(Filters.TRAINING_SYSTEM, allTrellis);
             }
         }
         // Create a Set to store all pollinators, we are using a set to stop duplicates from appearing
@@ -184,10 +208,16 @@ public class ItemSearcher {
 
                 if (pollinator == null) System.exit(0);
 
-                // if the customer selects a pollinator, add it to the list, otherwise break out of the loop
-                if (!pollinator.equalsIgnoreCase("na")) {
+                // if the customer selects a pollinator, add it to the list
+                if (!pollinator.equalsIgnoreCase("I don't mind")) {
                     tempPollinators.add(pollinator);
                 } else {
+                    // If the user doesn't mind what pollinator, add all pollinators to the map and break out of the loop
+                    Set<String> allPollinators = new HashSet<>(inventory.getAllPollinators(category.toString()));
+                    usersDreamPlant.put(Filters.POLLINATORS, allPollinators);
+                    // clearing the temp Pollinators list in-case the user selected a pollinator and wanted to choose a
+                    // second, then changed their mind on the second go around, prevents two sets getting added to the map.
+                    tempPollinators.clear();
                     break;
                 }
 
@@ -196,7 +226,6 @@ public class ItemSearcher {
                         appName, JOptionPane.YES_NO_OPTION);
             }
         }
-
         // If they chose to add at least one pollinator, add it to the map
         if (!tempPollinators.isEmpty()) {
             usersDreamPlant.put(Filters.POLLINATORS, tempPollinators);
@@ -217,6 +246,7 @@ public class ItemSearcher {
                 JOptionPane.showMessageDialog(null, "Invalid input. Please try again.", appName, JOptionPane.ERROR_MESSAGE);
             }
         }
+
         usersDreamPlant.put(Filters.POT_SIZE, potSize);
 
         int minPrice = -1, maxPrice = -1;
@@ -259,7 +289,8 @@ public class ItemSearcher {
             String choice = (String) JOptionPane.showInputDialog(null, infoToShow + "\n\nPlease select which item you'd like to order:", appName, JOptionPane.INFORMATION_MESSAGE, icon, options.keySet().toArray(), "");
             if(choice == null) System.exit(0);
             FruitingPlant chosenTree = options.get(choice);
-//            submitOrder(getContactInfo(),chosenTree, dreamFruitingPlant.getPotSize());
+            // this used to want to get dreamfruitingplants.getpotsize, I changed it to this, not sure if it works or not
+            submitOrder(getContactInfo(),chosenTree, Integer.parseInt(dreamFruitingPlant.getFilter(Filters.POT_SIZE).toString()));
             JOptionPane.showMessageDialog(null,"Thank you! Your order has been submitted. Please head to your local Greenie Geek to pay and pick up!",appName, JOptionPane.INFORMATION_MESSAGE);
         }
         else{

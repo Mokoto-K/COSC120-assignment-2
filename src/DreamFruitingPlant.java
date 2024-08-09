@@ -56,34 +56,47 @@ public class DreamFruitingPlant {
 
     public float getMinPrice() {return minPrice;}
 
-// TODO - The structure of the string will need to change once I can run the program
+    /**
+     * Takes a map and iterates through all keys and their values to a string builder that is returned as the description
+     * for any given tree.
+     * @param filters a map that contains all the keys from the users dream fruit to be used to iterate through and display
+     *                all stored fruit trees that matched user criteria
+     * @return String - String builders "to string" output of concatenated description data.
+     */
     public String getDreamPlantInformation(Map<Filters, Object> filters) {
-
-        StringBuilder sb = new StringBuilder();
+        // Create a new string builder to hold all of our description
+        StringBuilder description = new StringBuilder();
         for (Filters key : filters.keySet()) {
-            // Check if the keyset is a collection, if so, this means it's a list and there are multiple values to be
+            // Check if the key is pot size, if it is we must get the map holding the pot size's and prices and append
+            // all the values to the builder.
+            if (key.equals(Filters.POT_SIZE)) {
+                description.append("\n").append(Filters.POT_SIZE_PRICE).append(" : ");
+                DecimalFormat df = new DecimalFormat("0.00");
+                // Assign the pot price map to a new hashmap and iterate through all values appending them to the builder
+                // Suppressing the warning that is returned from assigning this to a map as java won't know until runtime
+                // if it is a map that contains integers and floats
+                // TODO - Find a better solution
+                @SuppressWarnings (value="unchecked")
+                LinkedHashMap<Integer, Float> potSizeToPrice = (LinkedHashMap<Integer, Float>) this.getFilter(Filters.POT_SIZE_PRICE);
+                for (Integer potSize : potSizeToPrice.keySet()) {
+                    description.append(potSize).append("inch: $").append(df.format(potSizeToPrice.get(potSize))).append(" | ");
+                }
+            }
+            // Check if the key set is a collection, if so, this means it's a list and there are multiple values to be
             // displayed, therefore iterate through all the values and append them to the string builder differently
-            if (this.getFilter(key) instanceof Collection<?>) {
-                sb.append("\n").append(key).append(" : ");
-                // for every values in the collection, append with a '|' between
+            else if (this.getFilter(key) instanceof Collection<?>) {
+                description.append("\n").append(key).append(" : ");
+                // For every value in the collection, append with a '|' between
                 for (Object obj : ((Collection<?>) this.getFilter(key)).toArray()) {
-                    sb.append(obj).append(" | ");
+                    description.append(obj).append(" | ");
                 }
             }
             else {
                 // Append the key and the values to the string builder
-                sb.append("\n").append(key).append(" : ").append(getFilter(key));
+                description.append("\n").append(key).append(" : ").append(getFilter(key));
             }
         }
-        return sb.toString();
-//        DecimalFormat df = new DecimalFormat("0.00");
-//        sb.append(isDwarf() ? "Yes" : "No")
-//                .append("\nAvailable pot sizes:\n| ");
-//        for (Integer potSize: potSizeToPrice.keySet()) {
-//            sb.append(potSize).append("inch: $").append(df.format(potSizeToPrice.get(potSize))).append(" | ");
-//        }
-//        sb.append("\n\n");
-//        return sb;
+        return description.toString();
     }
 
     // TODO - You have to try your hardest to implement exactly what this is doing, but in a more naturally you way
@@ -104,7 +117,7 @@ public class DreamFruitingPlant {
                 if (this.getFilter(key) instanceof Collection<?> && dreamFruitingPlant.getFilter(key) instanceof Collection<?>) {
                     Set<Object> intersect = new HashSet<>((Collection<?>) dreamFruitingPlant.getFilter(key));
                     intersect.retainAll((Collection<?>) dreamFruitingPlant.getFilter(key));
-//                    System.out.println("2");
+//                    System.out.println(key);
                     if (intersect.isEmpty()) return false;
                 }
 
@@ -116,9 +129,9 @@ public class DreamFruitingPlant {
                 }
 
                 else if (dreamFruitingPlant.getFilter(key) instanceof Collection<?> && !(this.getFilter(key) instanceof Collection<?>)) {
-//                    System.out.println("3");
+//                    System.out.println(key);
                     if (!((Collection<?>) dreamFruitingPlant.getFilter(key)).contains(this.getFilter(key))) {
-
+//                        System.out.println(dreamFruitingPlant.getFilter(key) + " " + this.getFilter(key));
 //                        System.out.println("4");
                         return false;
                     }
