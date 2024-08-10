@@ -14,75 +14,99 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ItemSearcher {
-
+    // TODO - Load inventory try catch statements for parsing in data
+    // TODO - Null pointer errors in getFilters
+    // TODO - Null pointer error in getContact info
+    // TODO - parameter testing to break the program
     private static final String filePath = "./inventory_v2.txt";
     private static final Icon icon = new ImageIcon("./the_greenie_geek.png");
     private static Inventory inventory;
     private static final String appName = "Greenie Geek";
 
     public static void main(String[] args) {
+        // initialising an inventory object with the return value from the load inventory method
         inventory = loadInventory(filePath);
+        // initialising a dream fruiting plant object with the return value from the getFilters method
         DreamFruitingPlant dreamFruitingPlant = getFilters();
+        // Passing the user's dream fruiting plant into the method for processing results
         processSearchResults(dreamFruitingPlant);
+        // exiting when finished
         System.exit(0);
     }
 
     /**
-     *
-     * @param filePath
-     * @return
+     * Opens a file which is our database of plants and proceeds to split and clean
+     * the data, going through each attribute and assigning it to it's designated
+     * variable, then placing all variables into a map as values with the enum
+     * "Filters" as the key. Finally creating a dream fruiting plant object, passing
+     * it the map and then creating a fruit plant object, passing it the dream fruit
+     * plant and key plant identifiers and adding it all to the set of all plants
+     * @param filePath a string containing the file path to our database file
+     * @return inventory object from the Inventory class, used to control the class methods and database
      */
     private static Inventory loadInventory(String filePath) {
+        // Create an inventory object
         Inventory inventory = new Inventory();
+        // Creating our path object
         Path path = Path.of(filePath);
+        // Creating a list to load our database into
         List<String> fileContents = null;
+        // Try to read all lines from the database and exit if there is a problem
         try {
             fileContents = Files.readAllLines(path);
         } catch (IOException io) {
             System.out.println("File could not be found");
             System.exit(0);
         }
-        // TODO some form of simple try catch around all this data in-case of data type reading error
+
+        // Iterate through each line of the database, sorting and cleaning the data
         for (int i = 1; i < fileContents.size(); i++) {
+            // Split the data up, remove the unwanted characters
             String[] info = fileContents.get(i).split("\\[");
             String[] singularInfo = info[0].split(",");
 
+            // Create subset strings from the above splits that will form collections
             String pollinatorsRaw = info[1].replace("],", "");
-            String pricesRaw = info[2].replace("],","");
+            String pricesRaw = info[2].replace("],", "");
             String potSizesRaw = info[3].replace("],", "");
-            String description = info[4].replace("]","");
+
+            // parse the description
+            String description = info[4].replace("]", "");
 
             // Parse in the category of plant from the database
-            // TODO- Fix the error message
             String category = singularInfo[0].toUpperCase().replace(" ", "_");
             try {
                 category = CategoryOfFruit.valueOf(category).toString();
-            } catch (Exception e) {
-                System.out.println("Plant not support in CategoryOfFruits enum, check database " + e);
+            } catch (IllegalArgumentException e) {
+                System.out.println("Error in file. Plant not supported by enum CategoryOfPlany" + (i + 1) + ". " +
+                        "Terminating. \nError message: " + e.getMessage());
             }
 
+            // Parse the product name, id, type, dwarf status and training system
             String productName = singularInfo[1];
             String productCode = singularInfo[2];
             String type = singularInfo[3].trim();
-
             String dwarf = singularInfo[4].trim();
             String trainingSystem = singularInfo[5];
 
-            // Create a list for our pollinators
+            // Initialise a list to hold all pollinators
             List<String> pollinatorList = new ArrayList<>();
-            // TODO perhaps add a try catch for this iteration specifically look at price below for example
+            // Create a string array for the pollinators by splitting on the comma, if the pollinator String isn't empty
             if (!pollinatorsRaw.isEmpty()) {
                 String[] pollinatorOptions = pollinatorsRaw.split(",");
+                // For each string in the array, clean the data and store it in the pollinator List
                 for (String p : pollinatorOptions) {
                     pollinatorList.add(p.replace("[", "").replace("]", "").trim());
                 }
             }
 
+            // Initialising a map to hold our pot sizes to price mapping, using a LinkedHashmap to preserve order for pricing
             Map<Integer,Float> potSizeToPrice = new LinkedHashMap<>();
+            // If the strings not empty, split both the pot sizes data and the prices data to two arrays
             if(potSizesRaw.length()>0) {
                 String[] optionsPotSizes = potSizesRaw.split(",");
-
                 String[] optionsPrices = pricesRaw.split(",");
+                // For each element in the prices array, parse the price as a float and the pot size as an int
                 for (int j=0;j<optionsPrices.length;j++){
                     int potSize = 0;
                     float price = 0f;
@@ -90,44 +114,53 @@ public class ItemSearcher {
                         potSize = Integer.parseInt(optionsPotSizes[j].trim());
                         price = Float.parseFloat(optionsPrices[j].trim());
                     } catch (IllegalArgumentException e) {
-                        System.out.println("Error in file. Pot size/price option could not be parsed for item on line " + (i + 1) + ". Terminating. \nError message: " + e.getMessage());
+                        System.out.println("Error in file. Pot size/price option could not be parsed for item on line "
+                                + (i + 1) + ". Terminating. \nError message: " + e.getMessage());
                         System.exit(0);
                     }
+                    // Use the pot size as the key and the prices as the values in the map
                     potSizeToPrice.put(potSize,price);
                 }
             }
+
+            // Initialise a list for the pot sizes
+            List<Integer> potSizeList = new ArrayList<>();
+            // If the string isn't empty, split it on the commas, clean the data and parse the data in as an int into our list
+            if(potSizesRaw.length()>0) {
+                String[] tempPotSize = potSizesRaw.split(",");
+                for (String potSizeOption : tempPotSize) {
+                    int potSize = Integer.parseInt(potSizeOption.trim());
+                    potSizeList.add(potSize);
+                }
+            }
+
             // Create a map to hold all of our databases features via keys from an enum
             Map<Filters, Object> filterMap = new LinkedHashMap<>();
-
             // Put all of our database features into the map
             filterMap.put(Filters.CATEGORY, category);
             filterMap.put(Filters.TYPE, type);
             filterMap.put(Filters.DWARF, dwarf);
             filterMap.put(Filters.TRAINING_SYSTEM, trainingSystem);
             filterMap.put(Filters.POLLINATORS, pollinatorList);
-            // TODO we might not need this, but putting it in for now just incase, everything to to with just the pot
-            //  sizes, not the price
-            List<Integer> potSizeList = new ArrayList<>();
-            if(potSizesRaw.length()>0) {
-                String[] optionsPotSizes = potSizesRaw.split(",");
-                for (String pSize : optionsPotSizes) {
-                    int potS = Integer.parseInt(pSize.trim());
-                    potSizeList.add(potS);
-                }
-            }
             filterMap.put(Filters.POT_SIZE, potSizeList);
             filterMap.put(Filters.POT_SIZE_PRICE, potSizeToPrice);
 
-            // Create a dreamFruituingPlant object passing it our map full of goodies
+            // Create a dreamFruitingPlant object passing it our map full of goodies
             DreamFruitingPlant dreamFruitingPlant = new DreamFruitingPlant(filterMap);
-
-//            DreamFruitingPlant dreamFruitingPlant = new DreamFruitingPlant(type, dwarf, 0, potSizeToPrice, 0, 0);
+            // Create a fruiting plant passing in the dream fruiting plant as well as the other pieces of data collected
             FruitingPlant fruitingPlant = new FruitingPlant(productName, productCode, description, dreamFruitingPlant);
+            // Add the fruiting plant to the inventory set
             inventory.addItem(fruitingPlant);
+
         }
         return inventory;
     }
 
+    /**
+     * Asks the user a series of questions about their dream fruiting plant, parsing all of their answers into
+     * a map that will represent their dream plant
+     * @return a dreamFruitingPlant containing a map of all the users choices and two variables for prices
+     */
     private static DreamFruitingPlant getFilters() {
 
         // Creating a map to hold all the users choices, using Linked to preserve order
@@ -153,7 +186,6 @@ public class ItemSearcher {
             usersDreamPlant.put(Filters.TYPE, allTypes);
         }
 
-        // TODO - Potential change to "I don't mind" and not NA
         // Filtering questions for if the customer did not choose vine for their plant
         if (!(category==CategoryOfFruit.VINE)) {
             Dwarf dwarf = (Dwarf) JOptionPane.showInputDialog(null, "Would you like a dwarf plant?",
@@ -231,22 +263,32 @@ public class ItemSearcher {
             }
         }
 
+        // Initialise the pot size to below the threshold and continue to loop through asking the user to enter a size
+        // they desired until it is within a possible range depending on what is in stock
         int potSize = 7;
-        while (potSize < 8) {
-            String userInput = (String) JOptionPane.showInputDialog(null, "What size pot would" +
-                    " you like? Options are even numbers from 8 - 16inch", appName, JOptionPane.QUESTION_MESSAGE, icon,
+        while (potSize < 8 || potSize > 17) {
+            String userInput = (String) JOptionPane.showInputDialog(null, "Enter the size pot would" +
+                    " you like as a number. Options range from 8, 10, 12, 14, and 16inch", appName, JOptionPane.QUESTION_MESSAGE, icon,
                     null, null);
 
             if (userInput == null) System.exit(0);
+
             try {
+                // Try to parse the user input
                 potSize = Integer.parseInt((userInput));
+                // Control structure to help guide the user with potential solutions if they are having problems
                 if (potSize < 7)
                     JOptionPane.showMessageDialog(null, "Pot size must be at least 8", appName, JOptionPane.ERROR_MESSAGE);
+                if (potSize > 16)
+                    JOptionPane.showMessageDialog(null, "Pot size must be at most 16", appName, JOptionPane.ERROR_MESSAGE);
+                if (!(potSize % 2 == 0)) {
+                    JOptionPane.showMessageDialog(null, "We only stock 8, 10, 12, 14, and 16 inch sizes", appName, JOptionPane.ERROR_MESSAGE);
+                }
             } catch (NumberFormatException e) {
                 JOptionPane.showMessageDialog(null, "Invalid input. Please try again.", appName, JOptionPane.ERROR_MESSAGE);
             }
         }
-
+        // add the pot size choice to the map
         usersDreamPlant.put(Filters.POT_SIZE, potSize);
 
         // Call the price values function to get the customers minimum and maximum prices they want
@@ -299,51 +341,98 @@ public class ItemSearcher {
         return new int[]{minPrice, maxPrice};
     }
 
+    /**
+     * Takes the users Dream plant, looks for any matches in the database related to the users choices
+     * if none are found, it informs the customer then exits, otherwise It will show the user all the
+     * possible choices that fit their critera and prompt them to make a selection, if a user does
+     * make a selection, it will call the submitOrder method passing in the users choice.
+     * @param dreamFruitingPlant a users dream plant made up from their choices
+     */
     private static void processSearchResults(DreamFruitingPlant dreamFruitingPlant){
+        // Fill with a list of matching fruit plants (if any) from the find match method, passing in the users plant
         List<FruitingPlant> matching = inventory.findMatch(dreamFruitingPlant);
+
+        // Check for at least a single match
         if(matching.size() > 0) {
+            // Create a map to hold matching fruit plants names as keys and their object as the value
             Map<String, FruitingPlant> options = new HashMap<>();
+
+            // Initialising a string builder that is used to popular a J option pane to show the user the returned results
             StringBuilder infoToShow = new StringBuilder("Matches found!! The following citrus trees meet your criteria: \n");
             for (FruitingPlant match : matching) {
-                // TODO - this was meant to just put a map in a tostring method, I dont know if this is a solution yet
+                // Pass each match into the fruiting plants to-string method, passing into that the users dream plant
+                // calling the get all filters method to get a list of features to return information on (Only those
+                // relevant to the customer)
                 infoToShow.append(match.toString(dreamFruitingPlant.getAllFilters()));
+                // Put the match into the map of user choices
                 options.put(match.productName(), match);
             }
-            String choice = (String) JOptionPane.showInputDialog(null, infoToShow + "\n\nPlease select which item you'd like to order:", appName, JOptionPane.INFORMATION_MESSAGE, icon, options.keySet().toArray(), "");
+            // Ask the user which tree they would like to order
+            String choice = (String) JOptionPane.showInputDialog(null, infoToShow + "\n\n" +
+                    "Please select which item you'd like to order:", appName, JOptionPane.INFORMATION_MESSAGE, icon,
+                    options.keySet().toArray(), "");
+            // Exit on null pointer
             if(choice == null) System.exit(0);
+            // Add the users choice to the options map
             FruitingPlant chosenTree = options.get(choice);
-            // this used to want to get dreamfruitingplants.getpotsize, I changed it to this, not sure if it works or not
+
+           // call submit order passing in all relevant information
             submitOrder(getContactInfo(),chosenTree, Integer.parseInt(dreamFruitingPlant.getFilter(Filters.POT_SIZE).toString()));
-            JOptionPane.showMessageDialog(null,"Thank you! Your order has been submitted. Please head to your local Greenie Geek to pay and pick up!",appName, JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(null,"Thank you! Your order has been submitted. " +
+                    "Please head to your local Greenie Geek to pay and pick up!",appName, JOptionPane.INFORMATION_MESSAGE);
         }
+        // Let the user know there were no matches
         else{
             JOptionPane.showMessageDialog(null,"Unfortunately none of our citrus trees meet your criteria :("+
                     "\n\tTo exit, click OK.",appName, JOptionPane.INFORMATION_MESSAGE);
         }
     }
-
+    /**
+     * Asks the customer for their name and phone number and creates a Customer
+     * object using this information
+     * @return a Customer object containing our customers information
+     */
     private static Customer getContactInfo(){
+        // Ask the user to enter their first and last name and check if it is correct.
         String name;
         do{
             name = (String) JOptionPane.showInputDialog(null,"Please enter your full name (in format firstname surname): ",appName,JOptionPane.QUESTION_MESSAGE, icon, null,null);
             if(name==null) System.exit(0);
         } while(!isValidFullName(name));
+
+        // Ask the user to enter their phone number and check if it is correct.
         String phoneNumber;
         do{
             phoneNumber = (String) JOptionPane.showInputDialog(null,"Please enter your phone number (10-digit number in the format 0412345678): ",appName,JOptionPane.QUESTION_MESSAGE, icon, null,null);
             if(phoneNumber==null) System.exit(0);}
+
+        // Send the users input to the isValidPhoneNumber function to check if it is correctly formatted
         while(!isValidPhoneNumber(phoneNumber));
+
+        // Return the created geek object from the users input
         return new Customer(name,phoneNumber);
     }
 
+    /**
+     * Takes the user's information, the fruiting tree they wish to order, and the requested pot Size
+     * and systematically adds all relevant information to a String that is then used to write a txt
+     * file of the user's order.
+     * @param customer - A Customer object of with the users name and phone number
+     * @param fruitingPlant - fruiting plant object the user has selected
+     * @param potSize - The users chosen potsize
+     */
     private static void submitOrder(Customer customer, FruitingPlant fruitingPlant, int potSize) {
+        // Set the name of our file
         String filePath = customer.name().replace(" ", "_") + "_" + fruitingPlant.productCode() + ".txt";
         Path path = Path.of(filePath);
+
+        // Concatenate out the string to be appended to the message
         String lineToWrite = "Order details:" +
                 "\n\tName: " + customer.name() + " ("+customer.phoneNumber() +")"+
                 "\n\tItem: " + fruitingPlant.productName() + " (" + fruitingPlant.productCode() + ")" +
                 "\n\tPot size (inch): "+potSize;
 
+        // Write the string to a file
         try {
             Files.writeString(path, lineToWrite);
         } catch (IOException io) {

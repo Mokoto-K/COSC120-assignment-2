@@ -131,7 +131,7 @@ public class DreamFruitingPlant {
                 if (this.getFilter(key) instanceof Collection<?> && dreamFruitingPlant.getFilter(key) instanceof Collection<?>) {
                     // Creating a set of objects of the database and dream users plants collection
                     Set<Object> intersect = new HashSet<>((Collection<?>) dreamFruitingPlant.getFilter(key));
-                    // if the set is empty after running retainall, then there were no matching features so we return false
+                    // if the set is empty after running retain all, then there were no matching features so we return false
                     intersect.retainAll((Collection<?>) dreamFruitingPlant.getFilter(key));
                     if (intersect.isEmpty()) return false;
                 }
@@ -154,9 +154,9 @@ public class DreamFruitingPlant {
                     // returning false if they don't match
                     return false;
                 }
-                // This else statement is a protective measure against their being an error in the database, since we are
+                // This else statement is a protective measure against there being an error in the database, since we are
                 // comparing if the key from a users plant is a key shared by a plant in the database, we should never
-                // end up here, but if there is a mistake in the database and it doesn't contain a key (plant value) that
+                // end up here, but if there is a mistake in the database, and it doesn't contain a key (plant value) that
                 // we expect it to have, the top "if" statement will be false and instantly return true without any
                 // comparison.
             } else {
