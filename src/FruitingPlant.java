@@ -6,7 +6,7 @@ import java.util.Map;
  * Add descriptor
  */
 // A record class representing Fruiting plants in the database
-public record FruitingPlant(String productCode, String productName, String description, DreamFruitingPlant dreamFruitingPlant) {
+public record FruitingPlant(String productName, String productCode, String description, DreamFruitingPlant dreamFruitingPlant) {
 
     /**
      * A to String method for the fruiting plant class, this returns a concatinated string of all the information of

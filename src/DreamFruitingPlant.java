@@ -14,46 +14,50 @@ public class DreamFruitingPlant {
     private float minPrice;
     private final Map<Filters,Object> filters;
 
-    // TODO add pollinators and training
+    /**
+     * A constructor serving primarily for user input
+     * @param filters - a map of the users dream fruit
+     * @param minPrice the min price a user is willing to pay
+     * @param maxPrice the max price a user is willing to pay
+     */
     public DreamFruitingPlant(Map<Filters,Object> filters, float minPrice, float maxPrice){
-        // TODO - whited out becuase in seek a geek this is used, but in pet app its not, not sure what should be in final
-//        if (filters==null) {
-//            this.filters = new LinkedHashMap<>();
-//        } else {
-//            this.filters = new HashMap<>(filters);
-//        }
-
         this.filters = new HashMap<>(filters);
         this.minPrice = minPrice;
         this.maxPrice = maxPrice;
     }
 
-    // TODO Figure out what its returning when I can actually run the program, same for the getter below
     /**
-     * Constructor for our hashmap, this will serve as our primary constructor for our program
-     * @param filters a
+     * Constructor to specificly handle our hashmap, this will serve as our primary constructor for our database
+     * @param filters a map containing all plants from the database and their attributes
      */
     public DreamFruitingPlant(Map<Filters, Object> filters) {
-//        if (filters==null) {
-//            this.filters = new LinkedHashMap<>();
-//        } else {
-//            this.filters = new HashMap<>(filters);
-//        }
         this.filters = new HashMap<>(filters);
     }
 
-    // TODO fill in this explainor after when it makes more sense
     /**
      * Getter for our Map of filters
-     * @return
+     * @return a hashmap of all plants and there attributes
      */
     public Map<Filters, Object> getAllFilters() {
         return new HashMap<>(filters); }
 
+    /**
+     *
+     * @param key representing a value from the filters enum
+     * @return the value from the fruitingPlant map returned when passing the key in
+     */
     public Object getFilter(Filters key) {return getAllFilters().get(key); }
 
+    /**
+     *
+     * @return gets the price of the users max price input
+     */
     public float getMaxPrice() {return maxPrice;}
 
+    /**
+     *
+     * @return gets the price of the users min price input
+     */
     public float getMinPrice() {return minPrice;}
 
     /**
@@ -72,14 +76,25 @@ public class DreamFruitingPlant {
             if (key.equals(Filters.POT_SIZE)) {
                 description.append("\n").append(Filters.POT_SIZE_PRICE).append(" : ");
                 DecimalFormat df = new DecimalFormat("0.00");
-                // Assign the pot price map to a new hashmap and iterate through all values appending them to the builder
-                // Suppressing the warning that is returned from assigning this to a map as java won't know until runtime
-                // if it is a map that contains integers and floats
-                // TODO - Find a better solution
-                @SuppressWarnings (value="unchecked")
-                LinkedHashMap<Integer, Float> potSizeToPrice = (LinkedHashMap<Integer, Float>) this.getFilter(Filters.POT_SIZE_PRICE);
-                for (Integer potSize : potSizeToPrice.keySet()) {
-                    description.append(potSize).append("inch: $").append(df.format(potSizeToPrice.get(potSize))).append(" | ");
+
+                // Initialise a LinkedHashMap, to retain order, this will be used to map the pot sizes to price from the db
+                Map<Integer, Float> potSizeToPriceMap = new LinkedHashMap<>();
+
+                // Get a hold of the Pot-size-to-price-map from our main plant map, turn it into a string, clean off the unwanted
+                // characters and create an array of strings, splitting on the comma.
+                String[] potSizePriceList = this.getFilter(Filters.POT_SIZE_PRICE).toString()
+                        .replace("{", "").replace("}","").split(",");
+
+                // Next, for every string in the potSizePriceList, create another String array, splitting on the equals sign
+                // and put both the first and second element into the map, parsing them as int and float. You now have control
+                // of your pot size to price map again
+                for(String potPrices : potSizePriceList) {
+                    String[] temp = potPrices.trim().split("=");
+                    potSizeToPriceMap.put(Integer.parseInt(temp[0]), Float.parseFloat(temp[1]));
+                }
+                // For each key in the map, append the key and the value to our string builder
+                for (Integer potSize : potSizeToPriceMap.keySet()) {
+                    description.append(potSize).append("inch: $").append(df.format(potSizeToPriceMap.get(potSize))).append(" | ");
                 }
             }
             // Check if the key set is a collection, if so, this means it's a list and there are multiple values to be
@@ -99,53 +114,56 @@ public class DreamFruitingPlant {
         return description.toString();
     }
 
-    // TODO - You have to try your hardest to implement exactly what this is doing, but in a more naturally you way
-    // I didn't write this, so im uneasy with it.
+    /**
+     * The comparison method for all plants. Compares the users dream plant against every plant in the database.
+     * @param dreamFruitingPlant the users dream plant in the form of a map
+     * @return true or false depending on if the plants match or not
+     */
     public boolean compareDreamPlants(DreamFruitingPlant dreamFruitingPlant) {
-        System.out.println(dreamFruitingPlant.getAllFilters());
-        System.out.println(this.getAllFilters());
-
+        // Iterate through all the keys in the users dream fruiting plant map, this ensures we only iterate through
+        // values (keys) stored in the users map and check for comparison of only those keys
         for (Filters key : dreamFruitingPlant.getAllFilters().keySet()) {
 
-//            if (this.getFilter(key).equals(dreamFruitingPlant.getFilter(key).toString()))
-//                return true;
-
-//            System.out.println(key);
+            // if a plant from the database contains a key that is also in the users dream plant map
             if (this.getAllFilters().containsKey(key)) {
-//                System.out.println("1");
 
+                // If both the database plant and the users dream plant are collection, compare them here
                 if (this.getFilter(key) instanceof Collection<?> && dreamFruitingPlant.getFilter(key) instanceof Collection<?>) {
+                    // Creating a set of objects of the database and dream users plants collection
                     Set<Object> intersect = new HashSet<>((Collection<?>) dreamFruitingPlant.getFilter(key));
+                    // if the set is empty after running retainall, then there were no matching features so we return false
                     intersect.retainAll((Collection<?>) dreamFruitingPlant.getFilter(key));
-//                    System.out.println(key);
                     if (intersect.isEmpty()) return false;
                 }
-
-                // I added this elif, might need to be deleted
+                // Comparing if the database plant is a collection and the users dream plants value is not
                 else if (this.getFilter(key) instanceof Collection<?> && !(dreamFruitingPlant.getFilter(key) instanceof Collection<?>)) {
+                    // return false if the users dream plant attribute isnt in the database plants collection
                     if (!((Collection<?>) this.getFilter(key)).contains(dreamFruitingPlant.getFilter(key))) {
                         return false;
                     }
                 }
-
+                // Comparing if the users dream plants value is a collection but the database plant is not
                 else if (dreamFruitingPlant.getFilter(key) instanceof Collection<?> && !(this.getFilter(key) instanceof Collection<?>)) {
-//                    System.out.println(key);
+                    // return false if the database plants attribute is not in the user's plants collection
                     if (!((Collection<?>) dreamFruitingPlant.getFilter(key)).contains(this.getFilter(key))) {
-//                        System.out.println(dreamFruitingPlant.getFilter(key) + " " + this.getFilter(key));
-//                        System.out.println("4");
                         return false;
                     }
-
                 }
+                // Comparing if the value from the database plant and the users dream plant are single values, not collections
                 else if (!this.getFilter(key).equals(dreamFruitingPlant.getFilter(key))) {
-//                    System.out.println(this.getFilter(key).toString());
-//                    System.out.println(dreamFruitingPlant.getFilter(key).toString());
-                    System.out.println(key + " " + this.getFilter(key).getClass() + " " + dreamFruitingPlant.getFilter(key).getClass());
+                    // returning false if they don't match
                     return false;
                 }
-                System.out.println(key + " Matched");
+                // This else statement is a protective measure against their being an error in the database, since we are
+                // comparing if the key from a users plant is a key shared by a plant in the database, we should never
+                // end up here, but if there is a mistake in the database and it doesn't contain a key (plant value) that
+                // we expect it to have, the top "if" statement will be false and instantly return true without any
+                // comparison.
+            } else {
+                return false;
             }
         }
+        // if a plant survives that gauntlet... we add it
         return true;
     }
 }

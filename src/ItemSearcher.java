@@ -14,9 +14,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ItemSearcher {
-    // TODO Price comparison
-    // TODO - getting users data
-    // TODO - creating the output file
+
     private static final String filePath = "./inventory_v2.txt";
     private static final Icon icon = new ImageIcon("./the_greenie_geek.png");
     private static Inventory inventory;
@@ -165,7 +163,7 @@ public class ItemSearcher {
 
             // Control structure for dwarf choice, if the user selects yes or no, just add that string
             if (!(dwarf==Dwarf.NA)) {
-                usersDreamPlant.put(Filters.DWARF, dwarf);
+                usersDreamPlant.put(Filters.DWARF, dwarf.toString().toLowerCase());
             }
             // If the user doesn't care about the tree being dwarf, just add all options to the dreamFruitPlant
             else {
