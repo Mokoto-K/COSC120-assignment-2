@@ -16,11 +16,11 @@ public enum Filters {
      */
     public String toString() {
         return switch (this) {
-            case CATEGORY -> "Type of fruit tree";
-            case TYPE -> "Type of fruit";
-            case DWARF -> "Dwarf or not";
-            case TRAINING_SYSTEM -> "System for training vines";
-            case POLLINATORS -> "Pollinators for fruiting trees";
+            case CATEGORY -> "Type of Tree";
+            case TYPE -> "Type of Fruit";
+            case DWARF -> "Dwarf";
+            case TRAINING_SYSTEM -> "System for Training";
+            case POLLINATORS -> "Pollinators Options";
             case POT_SIZE -> "Size of the pot";
             case POT_SIZE_PRICE -> "Prices for pot sizes";
         };

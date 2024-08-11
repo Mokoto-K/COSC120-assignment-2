@@ -14,9 +14,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ItemSearcher {
-    // TODO - Load inventory try catch statements for parsing in data
-    // TODO - Null pointer errors in getFilters
-    // TODO - Null pointer error in getContact info
     // TODO - parameter testing to break the program
     private static final String filePath = "./inventory_v2.txt";
     private static final Icon icon = new ImageIcon("./the_greenie_geek.png");
@@ -60,98 +57,108 @@ public class ItemSearcher {
         }
 
         // Iterate through each line of the database, sorting and cleaning the data
-        for (int i = 1; i < fileContents.size(); i++) {
-            // Split the data up, remove the unwanted characters
-            String[] info = fileContents.get(i).split("\\[");
-            String[] singularInfo = info[0].split(",");
+        try {
+            for (int i = 1; i < fileContents.size(); i++) {
+                // Split the data up, remove the unwanted characters
 
-            // Create subset strings from the above splits that will form collections
-            String pollinatorsRaw = info[1].replace("],", "");
-            String pricesRaw = info[2].replace("],", "");
-            String potSizesRaw = info[3].replace("],", "");
+                String[] info = fileContents.get(i).split("\\[");
+                String[] singularInfo = info[0].split(",");
 
-            // parse the description
-            String description = info[4].replace("]", "");
+                // Create subset strings from the above splits that will form collections
+                String pollinatorsRaw = info[1].replace("],", "");
+                String pricesRaw = info[2].replace("],", "");
+                String potSizesRaw = info[3].replace("],", "");
 
-            // Parse in the category of plant from the database
-            String category = singularInfo[0].toUpperCase().replace(" ", "_");
-            try {
-                category = CategoryOfFruit.valueOf(category).toString();
-            } catch (IllegalArgumentException e) {
-                System.out.println("Error in file. Plant not supported by enum CategoryOfPlany" + (i + 1) + ". " +
-                        "Terminating. \nError message: " + e.getMessage());
-            }
+                // parse the description
+                String description = info[4].replace("]", "");
 
-            // Parse the product name, id, type, dwarf status and training system
-            String productName = singularInfo[1];
-            String productCode = singularInfo[2];
-            String type = singularInfo[3].trim();
-            String dwarf = singularInfo[4].trim();
-            String trainingSystem = singularInfo[5];
-
-            // Initialise a list to hold all pollinators
-            List<String> pollinatorList = new ArrayList<>();
-            // Create a string array for the pollinators by splitting on the comma, if the pollinator String isn't empty
-            if (!pollinatorsRaw.isEmpty()) {
-                String[] pollinatorOptions = pollinatorsRaw.split(",");
-                // For each string in the array, clean the data and store it in the pollinator List
-                for (String p : pollinatorOptions) {
-                    pollinatorList.add(p.replace("[", "").replace("]", "").trim());
+                // Parse in the category of plant from the database
+                String category = singularInfo[0].toUpperCase().replace(" ", "_");
+                try {
+                    category = CategoryOfFruit.valueOf(category).toString();
+                } catch (IllegalArgumentException e) {
+                    System.out.println("Error in file. Plant not supported by enum CategoryOfPlant" + (i + 1) + ". " +
+                            "Terminating. \nError message: " + e.getMessage());
                 }
-            }
 
-            // Initialising a map to hold our pot sizes to price mapping, using a LinkedHashmap to preserve order for pricing
-            Map<Integer,Float> potSizeToPrice = new LinkedHashMap<>();
-            // If the strings not empty, split both the pot sizes data and the prices data to two arrays
-            if(potSizesRaw.length()>0) {
-                String[] optionsPotSizes = potSizesRaw.split(",");
-                String[] optionsPrices = pricesRaw.split(",");
-                // For each element in the prices array, parse the price as a float and the pot size as an int
-                for (int j=0;j<optionsPrices.length;j++){
-                    int potSize = 0;
-                    float price = 0f;
-                    try {
-                        potSize = Integer.parseInt(optionsPotSizes[j].trim());
-                        price = Float.parseFloat(optionsPrices[j].trim());
-                    } catch (IllegalArgumentException e) {
-                        System.out.println("Error in file. Pot size/price option could not be parsed for item on line "
-                                + (i + 1) + ". Terminating. \nError message: " + e.getMessage());
-                        System.exit(0);
+                // Parse the product name, id, type, dwarf status and training system
+                String productName = singularInfo[1];
+                String productCode = singularInfo[2];
+                String type = singularInfo[3].trim();
+                String dwarf = singularInfo[4].trim();
+                String trainingSystem = singularInfo[5];
+
+                // Initialise a list to hold all pollinators
+                List<String> pollinatorList = new ArrayList<>();
+                // Create a string array for the pollinators by splitting on the comma, if the pollinator String isn't empty
+                if (!pollinatorsRaw.isEmpty()) {
+                    String[] pollinatorOptions = pollinatorsRaw.split(",");
+                    // For each string in the array, clean the data and store it in the pollinator List
+                    for (String p : pollinatorOptions) {
+                        pollinatorList.add(p.replace("[", "").replace("]", "").trim());
                     }
-                    // Use the pot size as the key and the prices as the values in the map
-                    potSizeToPrice.put(potSize,price);
                 }
-            }
 
-            // Initialise a list for the pot sizes
-            List<Integer> potSizeList = new ArrayList<>();
-            // If the string isn't empty, split it on the commas, clean the data and parse the data in as an int into our list
-            if(potSizesRaw.length()>0) {
-                String[] tempPotSize = potSizesRaw.split(",");
-                for (String potSizeOption : tempPotSize) {
-                    int potSize = Integer.parseInt(potSizeOption.trim());
-                    potSizeList.add(potSize);
+                // Initialising a map to hold our pot sizes to price mapping, using a LinkedHashmap to preserve order for pricing
+                Map<Integer, Float> potSizeToPrice = new LinkedHashMap<>();
+                // If the strings not empty, split both the pot sizes data and the prices data to two arrays
+                if (potSizesRaw.length() > 0) {
+                    String[] optionsPotSizes = potSizesRaw.split(",");
+                    String[] optionsPrices = pricesRaw.split(",");
+                    // For each element in the prices array, parse the price as a float and the pot size as an int
+                    for (int j = 0; j < optionsPrices.length; j++) {
+                        int potSize = 0;
+                        float price = 0f;
+                        try {
+                            potSize = Integer.parseInt(optionsPotSizes[j].trim());
+                            price = Float.parseFloat(optionsPrices[j].trim());
+                        } catch (IllegalArgumentException e) {
+                            System.out.println("Error in file. Pot size/price option could not be parsed for item on line "
+                                    + (i + 1) + ". Terminating. \nError message: " + e.getMessage());
+                            System.exit(0);
+                        }
+                        // Use the pot size as the key and the prices as the values in the map
+                        potSizeToPrice.put(potSize, price);
+                    }
                 }
+
+                // Initialise a list for the pot sizes
+                List<Integer> potSizeList = new ArrayList<>();
+                // If the string isn't empty, split it on the commas, clean the data and parse the data in as an int into our list
+                if (potSizesRaw.length() > 0) {
+                    String[] tempPotSize = potSizesRaw.split(",");
+                    for (String potSizeOption : tempPotSize) {
+                        int potSize = Integer.parseInt(potSizeOption.trim());
+                        potSizeList.add(potSize);
+                    }
+                }
+
+                // Create a map to hold all of our databases features via keys from an enum
+                Map<Filters, Object> filterMap = new LinkedHashMap<>();
+                // Put all of our database features into the map
+                filterMap.put(Filters.CATEGORY, category);
+                filterMap.put(Filters.TYPE, type);
+                filterMap.put(Filters.DWARF, dwarf);
+                filterMap.put(Filters.TRAINING_SYSTEM, trainingSystem);
+                filterMap.put(Filters.POLLINATORS, pollinatorList);
+                filterMap.put(Filters.POT_SIZE, potSizeList);
+                filterMap.put(Filters.POT_SIZE_PRICE, potSizeToPrice);
+
+                // Create a dreamFruitingPlant object passing it our map full of goodies
+                DreamFruitingPlant dreamFruitingPlant = new DreamFruitingPlant(filterMap);
+                // Create a fruiting plant passing in the dream fruiting plant as well as the other pieces of data collected
+                FruitingPlant fruitingPlant = new FruitingPlant(productName, productCode, description, dreamFruitingPlant);
+                // Add the fruiting plant to the inventory set
+                inventory.addItem(fruitingPlant);
             }
-
-            // Create a map to hold all of our databases features via keys from an enum
-            Map<Filters, Object> filterMap = new LinkedHashMap<>();
-            // Put all of our database features into the map
-            filterMap.put(Filters.CATEGORY, category);
-            filterMap.put(Filters.TYPE, type);
-            filterMap.put(Filters.DWARF, dwarf);
-            filterMap.put(Filters.TRAINING_SYSTEM, trainingSystem);
-            filterMap.put(Filters.POLLINATORS, pollinatorList);
-            filterMap.put(Filters.POT_SIZE, potSizeList);
-            filterMap.put(Filters.POT_SIZE_PRICE, potSizeToPrice);
-
-            // Create a dreamFruitingPlant object passing it our map full of goodies
-            DreamFruitingPlant dreamFruitingPlant = new DreamFruitingPlant(filterMap);
-            // Create a fruiting plant passing in the dream fruiting plant as well as the other pieces of data collected
-            FruitingPlant fruitingPlant = new FruitingPlant(productName, productCode, description, dreamFruitingPlant);
-            // Add the fruiting plant to the inventory set
-            inventory.addItem(fruitingPlant);
-
+        } // TODO - Find a more accurate exception for this problem
+        catch (Exception e) {
+            System.out.println("A error reading the database file occurred" + e.getMessage());
+            JOptionPane.showMessageDialog(null, "There was an error reading the plants database," +
+                            " perhaps the file is missing, named incorrectly or the database structure is incorrect. Please" +
+                            " check your database file and try again"
+                    , appName, JOptionPane.INFORMATION_MESSAGE, icon);
+            System.exit(0);
         }
         return inventory;
     }
@@ -169,6 +176,7 @@ public class ItemSearcher {
         // First asking the user what type of plant they are looking to buy
         CategoryOfFruit category = (CategoryOfFruit) JOptionPane.showInputDialog(null, "Please select the type " +
                 "of plant you'd like to purchase", appName, JOptionPane.QUESTION_MESSAGE, icon, CategoryOfFruit.values(), CategoryOfFruit.CITRUS);
+        if (category == null) System.exit(0);
         // adding their selection to the map
         usersDreamPlant.put(Filters.CATEGORY, category.toString());
 
@@ -254,8 +262,8 @@ public class ItemSearcher {
             if (trainingSystem == null) System.exit(0);
 
             // Control structure for all trellis, if user wants a specific trellis, add it to the map
-            if (!type.equalsIgnoreCase("SKIP (any will do)")) {
-                usersDreamPlant.put(Filters.TRAINING_SYSTEM, type);
+            if (!trainingSystem.equalsIgnoreCase("SKIP (any will do)")) {
+                usersDreamPlant.put(Filters.TRAINING_SYSTEM, trainingSystem);
             } else {
                 // If the user doesn't mind what trellis, add all types to the map
                 List<String> allTrellis = new ArrayList<>(inventory.getAllTrellis(category.toString()));
@@ -266,7 +274,7 @@ public class ItemSearcher {
         // Initialise the pot size to below the threshold and continue to loop through asking the user to enter a size
         // they desired until it is within a possible range depending on what is in stock
         int potSize = 7;
-        while (potSize < 8 || potSize > 17) {
+        while (potSize < 8 || potSize > 17 || !(potSize % 2 == 0)) {
             String userInput = (String) JOptionPane.showInputDialog(null, "Enter the size pot would" +
                     " you like as a number. Options range from 8, 10, 12, 14, and 16inch", appName, JOptionPane.QUESTION_MESSAGE, icon,
                     null, null);
@@ -383,7 +391,7 @@ public class ItemSearcher {
         }
         // Let the user know there were no matches
         else{
-            JOptionPane.showMessageDialog(null,"Unfortunately none of our citrus trees meet your criteria :("+
+            JOptionPane.showMessageDialog(null,"Unfortunately none of our fruiting trees meet your criteria :("+
                     "\n\tTo exit, click OK.",appName, JOptionPane.INFORMATION_MESSAGE);
         }
     }

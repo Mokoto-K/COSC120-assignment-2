@@ -9,7 +9,6 @@
 public enum CategoryOfFruit {
     POME, VINE, CITRUS, STONE_FRUIT;
 
-    // TODO perhaps change the strings to be more.... glamorous
     /**
      * @return a cute rendition of the corresponding enum class of fruit
      */

@@ -123,7 +123,6 @@ public class DreamFruitingPlant {
         // Iterate through all the keys in the users dream fruiting plant map, this ensures we only iterate through
         // values (keys) stored in the users map and check for comparison of only those keys
         for (Filters key : dreamFruitingPlant.getAllFilters().keySet()) {
-
             // if a plant from the database contains a key that is also in the users dream plant map
             if (this.getAllFilters().containsKey(key)) {
 

@@ -23,17 +23,17 @@ public class Inventory {
     /**
      * Takes the users dream plant, calls the comparison method and compares plant prices to user input, if
      * it is a match it is added to a list to be return for the use of processing a users choice
-     * @param dreamPlant - a users dream plant
+     * @param dreamFruitingPlant - a users dream plant
      * @return Matching - a list containing all plants from the database that match the users inputs.
      */
-    public List<FruitingPlant> findMatch(DreamFruitingPlant dreamPlant){
+    public List<FruitingPlant> findMatch(DreamFruitingPlant dreamFruitingPlant){
         // Initialise a list that will be used to hold all matching plants from the database
         List<FruitingPlant> matching = new ArrayList<>();
 
         // Iterate through all plants in the database for comparison
         for(FruitingPlant fruitingPlant : inventory){
             // Call the comparison function from the dream Fruiting class, if it returns false, move onto the next plant
-            if (!fruitingPlant.dreamFruitingPlant().compareDreamPlants(dreamPlant)) continue;
+            if (!fruitingPlant.dreamFruitingPlant().compareDreamPlants(dreamFruitingPlant)) continue;
 
             // Initialise a LinkedHashMap, to retain order, this will be used to map the pot sizes to price from the db
             Map<Integer, Float> correspondingPriceMap = new LinkedHashMap<>();
@@ -51,10 +51,10 @@ public class Inventory {
                 correspondingPriceMap.put(Integer.parseInt(temp[0]), Float.parseFloat(temp[1]));
             }
             // Pass the users requested pot size into the newly created map retrieving from it the price fot that pot size
-            Float correspondingPrice = correspondingPriceMap.get((int) dreamPlant.getFilter(Filters.POT_SIZE));
+            Float correspondingPrice = correspondingPriceMap.get((int) dreamFruitingPlant.getFilter(Filters.POT_SIZE));
             // If the price for the plant at the users specified pot size is less then the min requested or greater than
             // the max price specified, move onto the next plant, otherwise add it to our list of matching plants.
-            if(correspondingPrice < dreamPlant.getMinPrice() || correspondingPrice > dreamPlant.getMaxPrice()) continue;
+            if(correspondingPrice < dreamFruitingPlant.getMinPrice() || correspondingPrice > dreamFruitingPlant.getMaxPrice()) continue;
             matching.add(fruitingPlant);
         }
         return matching;
@@ -99,7 +99,6 @@ public class Inventory {
         // for every plant in the database, if its category matches the user's choice, get the trellis from that
         // category of plant and assign them to an array of strings
         for(FruitingPlant fruitingPlant : inventory){
-
             // for every trellis in the array list, clean the string and add it to our set
             if (fruitingPlant.dreamFruitingPlant().getFilter(Filters.CATEGORY).equals(category)) {
                 allTrellis.add(fruitingPlant.dreamFruitingPlant().getFilter(Filters.TRAINING_SYSTEM).toString());
