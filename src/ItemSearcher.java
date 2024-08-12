@@ -182,7 +182,7 @@ public class ItemSearcher {
 
         // Getting the type of fruit the user wants and adding it to the map if their choice is not "NA"
         String type = (String) JOptionPane.showInputDialog(null, "Please select your preferred " +
-                "type", appName, JOptionPane.QUESTION_MESSAGE, icon, inventory.getAllTypes(category.toString()).toArray(), null);
+                "type", appName, JOptionPane.QUESTION_MESSAGE, icon, inventory.getAllOptions(category.toString(), Filters.TYPE).toArray(), null);
         if (type == null) System.exit(0);
 
         // Control structure for all types, if user wants a specific type, add it to the map
@@ -190,7 +190,7 @@ public class ItemSearcher {
             usersDreamPlant.put(Filters.TYPE, type);
         } else {
             // If the user doesn't mind what type, add all types to the map
-            List<String> allTypes = new ArrayList<>(inventory.getAllTypes(category.toString()));
+            List<String> allTypes = new ArrayList<>(inventory.getAllOptions(category.toString(), Filters.TYPE));
             usersDreamPlant.put(Filters.TYPE, allTypes);
         }
 
@@ -227,7 +227,7 @@ public class ItemSearcher {
                 while (decision == 0) {
                     // Obtaining the users choice of pollinator
                     String pollinator = (String) JOptionPane.showInputDialog(null, "Would you like to add any pollinators",
-                            appName, JOptionPane.QUESTION_MESSAGE, icon, inventory.getAllPollinators(category.toString()).toArray(), null);
+                            appName, JOptionPane.QUESTION_MESSAGE, icon, inventory.getAllOptions(category.toString(), Filters.POLLINATORS).toArray(), null);
 
                     // Handling the null pointer error
                     if (pollinator == null) System.exit(0);
@@ -237,7 +237,7 @@ public class ItemSearcher {
                         listOfPollinators.add(pollinator);
                     } else {
                         // If the user doesn't mind what pollinator, add all pollinators to the map and break out of the loop
-                        Set<String> allPollinators = new HashSet<>(inventory.getAllPollinators(category.toString()));
+                        Set<String> allPollinators = new HashSet<>(inventory.getAllOptions(category.toString(), Filters.POLLINATORS));
                         usersDreamPlant.put(Filters.POLLINATORS, allPollinators);
                         // clearing the list of Pollinators list in-case the user selected a pollinator and wanted to choose a
                         // second, then changed their mind on the second go around, prevents two sets getting added to the map.
@@ -256,7 +256,7 @@ public class ItemSearcher {
         } else {
             // Only asking the customer what training system they would like if they chose vine as their category of plant
             String trainingSystem = (String) JOptionPane.showInputDialog(null, "What type of training system would you like for your vine?",
-                    appName, JOptionPane.QUESTION_MESSAGE, icon, inventory.getAllTrellis(category.toString()).toArray(), null);
+                    appName, JOptionPane.QUESTION_MESSAGE, icon, inventory.getAllOptions(category.toString(), Filters.TRAINING_SYSTEM).toArray(), null);
 
             // Handling the null pointer error
             if (trainingSystem == null) System.exit(0);
@@ -266,7 +266,7 @@ public class ItemSearcher {
                 usersDreamPlant.put(Filters.TRAINING_SYSTEM, trainingSystem);
             } else {
                 // If the user doesn't mind what trellis, add all types to the map
-                List<String> allTrellis = new ArrayList<>(inventory.getAllTrellis(category.toString()));
+                List<String> allTrellis = new ArrayList<>(inventory.getAllOptions(category.toString(), Filters.TRAINING_SYSTEM));
                 usersDreamPlant.put(Filters.TRAINING_SYSTEM, allTrellis);
             }
         }
@@ -274,11 +274,13 @@ public class ItemSearcher {
         // Initialise the pot size to below the threshold and continue to loop through asking the user to enter a size
         // they desired until it is within a possible range depending on what is in stock
         int potSize = 7;
+        // Continue the loop until the user enters an even number between 8 and 16 inclusive
         while (potSize < 8 || potSize > 17 || !(potSize % 2 == 0)) {
+            // Saving the variable as a string instead of an int for easier option to check for null case
             String userInput = (String) JOptionPane.showInputDialog(null, "Enter the size pot would" +
                     " you like as a number. Options range from 8, 10, 12, 14, and 16inch", appName, JOptionPane.QUESTION_MESSAGE, icon,
                     null, null);
-
+            // Handle the null case
             if (userInput == null) System.exit(0);
 
             try {
@@ -286,21 +288,25 @@ public class ItemSearcher {
                 potSize = Integer.parseInt((userInput));
                 // Control structure to help guide the user with potential solutions if they are having problems
                 if (potSize < 7)
-                    JOptionPane.showMessageDialog(null, "Pot size must be at least 8", appName, JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Pot size must be at least 8",
+                            appName, JOptionPane.ERROR_MESSAGE);
                 if (potSize > 16)
-                    JOptionPane.showMessageDialog(null, "Pot size must be at most 16", appName, JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Pot size must be at most 16",
+                            appName, JOptionPane.ERROR_MESSAGE);
                 if (!(potSize % 2 == 0)) {
-                    JOptionPane.showMessageDialog(null, "We only stock 8, 10, 12, 14, and 16 inch sizes", appName, JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "We only stock 8, 10, 12, 14, 16inch pots",
+                            appName, JOptionPane.ERROR_MESSAGE);
                 }
             } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(null, "Invalid input. Please try again.", appName, JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Invalid input. Please try again.",
+                        appName, JOptionPane.ERROR_MESSAGE);
             }
         }
         // add the pot size choice to the map
         usersDreamPlant.put(Filters.POT_SIZE, potSize);
 
         // Call the price values function to get the customers minimum and maximum prices they want
-        int[] price = priceValues();
+        int[] price = minMaxPrices();
 
         return new DreamFruitingPlant(usersDreamPlant, price[0], price[1]);
     }
@@ -310,12 +316,14 @@ public class ItemSearcher {
      * assigns these two values to an int array
      * @return an int array containing the maximum and minimum prices the customer has selected to pay
      */
-    private static int[] priceValues() {
+    private static int[] minMaxPrices() {
         // Set the two variables
         int minPrice = -1, maxPrice = -1;
+
         // Continue to ask the user to enter a min price until they enter a value ≥ 0
         while (minPrice < 0) {
-            String userInput = (String) JOptionPane.showInputDialog(null, "Enter min price range value:", appName, JOptionPane.QUESTION_MESSAGE, icon, null, null);
+            String userInput = (String) JOptionPane.showInputDialog(null, "Enter min price " +
+                    "range value:", appName, JOptionPane.QUESTION_MESSAGE, icon, null, null);
             // Handle null pointer error
             if (userInput == null) System.exit(0);
             // Try to parse the string as an int
@@ -323,15 +331,18 @@ public class ItemSearcher {
                 minPrice = Integer.parseInt(userInput);
                 // Check the int doesn't meet our expectations
                 if (minPrice < 0)
-                    JOptionPane.showMessageDialog(null, "Price must be >= 0.", appName, JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Price must be >= 0.", appName,
+                            JOptionPane.ERROR_MESSAGE);
                 // Catch any non number inputs
             } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(null, "Invalid input. Please try again.", appName, JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Invalid input. Please try again.",
+                        appName, JOptionPane.ERROR_MESSAGE);
             }
         }
         // Continue to ask the user to enter a max price until they enter a value > the min price
         while (maxPrice < minPrice) {
-            String userInput = (String) JOptionPane.showInputDialog(null, "Enter max price range value:", appName, JOptionPane.QUESTION_MESSAGE, icon, null, null);
+            String userInput = (String) JOptionPane.showInputDialog(null, "Enter max price " +
+                    "range value:", appName, JOptionPane.QUESTION_MESSAGE, icon, null, null);
             // Handle null pointer error
             if (userInput == null) System.exit(0);
             // Try to parse the string as an int
@@ -339,10 +350,12 @@ public class ItemSearcher {
                 maxPrice = Integer.parseInt(userInput);
                 // Check the int doesn't meet our expectations
                 if (maxPrice < minPrice)
-                    JOptionPane.showMessageDialog(null, "Price must be >= " + minPrice, appName, JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Price must be >= " + minPrice, appName,
+                            JOptionPane.ERROR_MESSAGE);
                 // Catch any non number inputs
             } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(null, "Invalid input. Please try again.", appName, JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Invalid input. Please try again.", appName,
+                        JOptionPane.ERROR_MESSAGE);
             }
         }
         // Return the two values as an int array
@@ -395,6 +408,7 @@ public class ItemSearcher {
                     "\n\tTo exit, click OK.",appName, JOptionPane.INFORMATION_MESSAGE);
         }
     }
+
     /**
      * Asks the customer for their name and phone number and creates a Customer
      * object using this information
