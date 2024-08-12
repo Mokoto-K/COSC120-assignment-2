@@ -151,7 +151,9 @@ public class ItemSearcher {
                 // Add the fruiting plant to the inventory set
                 inventory.addItem(fruitingPlant);
             }
-        } // TODO - Find a more accurate exception for this problem
+        } // Casting a very wide net with this exception, there are a few different types of exceptions that can be thrown
+        // and although it's not industry standard to just blanket with "Exception" I don't think it's terrible in this
+        // situation as we are just trying to catch any possible problem with the database and shut the program down immediately
         catch (Exception e) {
             System.out.println("A error reading the database file occurred" + e.getMessage());
             JOptionPane.showMessageDialog(null, "There was an error reading the plants database," +
@@ -290,11 +292,11 @@ public class ItemSearcher {
                 if (potSize < 7)
                     JOptionPane.showMessageDialog(null, "Pot size must be at least 8",
                             appName, JOptionPane.ERROR_MESSAGE);
-                if (potSize > 16)
-                    JOptionPane.showMessageDialog(null, "Pot size must be at most 16",
+                if (potSize > 18)
+                    JOptionPane.showMessageDialog(null, "Pot size must be at most 18",
                             appName, JOptionPane.ERROR_MESSAGE);
                 if (!(potSize % 2 == 0)) {
-                    JOptionPane.showMessageDialog(null, "We only stock 8, 10, 12, 14, 16inch pots",
+                    JOptionPane.showMessageDialog(null, "We only stock 8, 10, 12, 14, 16 or 18inch pots",
                             appName, JOptionPane.ERROR_MESSAGE);
                 }
             } catch (NumberFormatException e) {
