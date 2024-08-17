@@ -14,7 +14,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ItemSearcher {
-    // TODO - parameter testing to break the program
+
     private static final String filePath = "./inventory_v2.txt";
     private static final Icon icon = new ImageIcon("./the_greenie_geek.png");
     private static Inventory inventory;
@@ -102,7 +102,7 @@ public class ItemSearcher {
                 // Initialising a map to hold our pot sizes to price mapping, using a LinkedHashmap to preserve order for pricing
                 Map<Integer, Float> potSizeToPrice = new LinkedHashMap<>();
                 // If the strings not empty, split both the pot sizes data and the prices data to two arrays
-                if (potSizesRaw.length() > 0) {
+                if (!potSizesRaw.isEmpty()) {
                     String[] optionsPotSizes = potSizesRaw.split(",");
                     String[] optionsPrices = pricesRaw.split(",");
                     // For each element in the prices array, parse the price as a float and the pot size as an int
@@ -125,7 +125,7 @@ public class ItemSearcher {
                 // Initialise a list for the pot sizes
                 List<Integer> potSizeList = new ArrayList<>();
                 // If the string isn't empty, split it on the commas, clean the data and parse the data in as an int into our list
-                if (potSizesRaw.length() > 0) {
+                if (!potSizesRaw.isEmpty()) {
                     String[] tempPotSize = potSizesRaw.split(",");
                     for (String potSizeOption : tempPotSize) {
                         int potSize = Integer.parseInt(potSizeOption.trim());
@@ -376,7 +376,7 @@ public class ItemSearcher {
         List<FruitingPlant> matching = inventory.findMatch(dreamFruitingPlant);
 
         // Check for at least a single match
-        if(matching.size() > 0) {
+        if(!matching.isEmpty()) {
             // Create a map to hold matching fruit plants names as keys and their object as the value
             Map<String, FruitingPlant> options = new HashMap<>();
 
@@ -472,7 +472,7 @@ public class ItemSearcher {
      * @return boolean True of False whether the input matched the required format
      */
     private static boolean isValidFullName(String fullName) {
-        // TODO this might not be good enough, re check before submission to see what happened with ass1 with this regex
+
         Pattern pattern = Pattern.compile("^([A-Z][a-z '.-]*(\\s))+[A-Z][a-z '.-]*$");
 
         // Match the users input against the required format
