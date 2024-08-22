@@ -152,8 +152,9 @@ public class ItemSearcher {
                 inventory.addItem(fruitingPlant);
             }
         } // Casting a very wide net with this exception, there are a few different types of exceptions that can be thrown
-        // and although it's not industry standard to just blanket with "Exception" I don't think it's terrible in this
+        // although it's not industry standard to just blanket with "Exception" I don't think it's terrible in this
         // situation as we are just trying to catch any possible problem with the database and shut the program down immediately
+        // we are also alerting the developer
         catch (Exception e) {
             System.out.println("A error reading the database file occurred" + e.getMessage());
             JOptionPane.showMessageDialog(null, "There was an error reading the plants database," +
@@ -178,14 +179,21 @@ public class ItemSearcher {
         // First asking the user what type of plant they are looking to buy
         CategoryOfFruit category = (CategoryOfFruit) JOptionPane.showInputDialog(null, "Please select the type " +
                 "of plant you'd like to purchase", appName, JOptionPane.QUESTION_MESSAGE, icon, CategoryOfFruit.values(), CategoryOfFruit.CITRUS);
-        if (category == null) System.exit(0);
+        if (category == null) {
+            JOptionPane.showMessageDialog(null, "Sorry we couldn't help you today");
+            System.exit(0);
+        }
+
         // adding their selection to the map
         usersDreamPlant.put(Filters.CATEGORY, category.toString());
 
         // Getting the type of fruit the user wants and adding it to the map if their choice is not "NA"
         String type = (String) JOptionPane.showInputDialog(null, "Please select your preferred " +
                 "type", appName, JOptionPane.QUESTION_MESSAGE, icon, inventory.getAllOptions(category.toString(), Filters.TYPE).toArray(), null);
-        if (type == null) System.exit(0);
+        if (type == null) {
+            JOptionPane.showMessageDialog(null, "Sorry we couldn't help you today");
+            System.exit(0);
+        }
 
         // Control structure for all types, if user wants a specific type, add it to the map
         if (!type.equalsIgnoreCase("SKIP (any will do)")) {
@@ -201,7 +209,10 @@ public class ItemSearcher {
             Dwarf dwarf = (Dwarf) JOptionPane.showInputDialog(null, "Would you like a dwarf plant?",
                     appName, JOptionPane.QUESTION_MESSAGE, icon, Dwarf.values(), Dwarf.YES);
 
-            if (dwarf == null) System.exit(0);
+            if (dwarf == null) {
+                JOptionPane.showMessageDialog(null, "Sorry we couldn't help you today");
+                System.exit(0);
+            }
 
             // Control structure for dwarf choice, if the user selects yes or no, just add that string
             if (!(dwarf==Dwarf.NA)) {
@@ -232,7 +243,10 @@ public class ItemSearcher {
                             appName, JOptionPane.QUESTION_MESSAGE, icon, inventory.getAllOptions(category.toString(), Filters.POLLINATORS).toArray(), null);
 
                     // Handling the null pointer error
-                    if (pollinator == null) System.exit(0);
+                    if (pollinator == null) {
+                        JOptionPane.showMessageDialog(null, "Sorry we couldn't help you today");
+                        System.exit(0);
+                    }
 
                     // if the customer selects a pollinator, add it to the list
                     if (!pollinator.equalsIgnoreCase("SKIP (any will do)")) {
@@ -261,7 +275,10 @@ public class ItemSearcher {
                     appName, JOptionPane.QUESTION_MESSAGE, icon, inventory.getAllOptions(category.toString(), Filters.TRAINING_SYSTEM).toArray(), null);
 
             // Handling the null pointer error
-            if (trainingSystem == null) System.exit(0);
+            if (trainingSystem == null) {
+                JOptionPane.showMessageDialog(null, "Sorry we couldn't help you today");
+                System.exit(0);
+            }
 
             // Control structure for all trellis, if user wants a specific trellis, add it to the map
             if (!trainingSystem.equalsIgnoreCase("SKIP (any will do)")) {
@@ -283,7 +300,10 @@ public class ItemSearcher {
                     " you like as a number. Options range from 8, 10, 12, 14, and 16inch", appName, JOptionPane.QUESTION_MESSAGE, icon,
                     null, null);
             // Handle the null case
-            if (userInput == null) System.exit(0);
+            if (userInput == null) {
+                JOptionPane.showMessageDialog(null, "Sorry we couldn't help you today");
+                System.exit(0);
+            }
 
             try {
                 // Try to parse the user input
@@ -327,7 +347,10 @@ public class ItemSearcher {
             String userInput = (String) JOptionPane.showInputDialog(null, "Enter min price " +
                     "range value:", appName, JOptionPane.QUESTION_MESSAGE, icon, null, null);
             // Handle null pointer error
-            if (userInput == null) System.exit(0);
+            if (userInput == null) {
+                JOptionPane.showMessageDialog(null, "Sorry we couldn't help you today");
+                System.exit(0);
+            }
             // Try to parse the string as an int
             try {
                 minPrice = Integer.parseInt(userInput);
@@ -346,7 +369,10 @@ public class ItemSearcher {
             String userInput = (String) JOptionPane.showInputDialog(null, "Enter max price " +
                     "range value:", appName, JOptionPane.QUESTION_MESSAGE, icon, null, null);
             // Handle null pointer error
-            if (userInput == null) System.exit(0);
+            if (userInput == null) {
+                JOptionPane.showMessageDialog(null, "Sorry we couldn't help you today");
+                System.exit(0);
+            }
             // Try to parse the string as an int
             try {
                 maxPrice = Integer.parseInt(userInput);
@@ -421,14 +447,21 @@ public class ItemSearcher {
         String name;
         do{
             name = (String) JOptionPane.showInputDialog(null,"Please enter your full name (in format firstname surname): ",appName,JOptionPane.QUESTION_MESSAGE, icon, null,null);
-            if(name==null) System.exit(0);
+            if(name==null) {
+                JOptionPane.showMessageDialog(null, "Sorry we couldn't help you today");
+                System.exit(0);
+            }
         } while(!isValidFullName(name));
 
         // Ask the user to enter their phone number and check if it is correct.
         String phoneNumber;
         do{
             phoneNumber = (String) JOptionPane.showInputDialog(null,"Please enter your phone number (10-digit number in the format 0412345678): ",appName,JOptionPane.QUESTION_MESSAGE, icon, null,null);
-            if(phoneNumber==null) System.exit(0);}
+            if(phoneNumber==null) {
+                JOptionPane.showMessageDialog(null, "Sorry we couldn't help you today");
+                System.exit(0);
+            }
+        }
 
         // Send the users input to the isValidPhoneNumber function to check if it is correctly formatted
         while(!isValidPhoneNumber(phoneNumber));
